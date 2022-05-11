@@ -13,6 +13,8 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.message import EmailMessage
 from email import encoders
+from tiger_pass import senha
+
 
 
 
@@ -77,15 +79,32 @@ while numero <= fim_contagem:
 
     data = cves.find('span', attrs={'data-testid': 'vuln-published-on-' + str(numero)})
 
+    if (severity):
+
+        severity = cves.find('a', attrs={'data-testid': 'vuln-cvss3-link-' + str(numero)})
+    else:
+        severity = " "
+
+    segunda_pag = navegador.find('a', attrs={'data-testid': 'vuln-detail-link-' + str(numero)})
+    segunda_pag.click()
+    
+    hyperlink = cves.find('a', attrs={'class': 'external' + str(numero)})
+
+    known = cves.find('b', attrs={'data-testid': 'vuln-software-cpe-1-0-0'})
+
+    navegador.back()
+
     numero = numero + 1
 
-    dados_scraping.append([titulo.text, link['href'], descricao.text, data.text])
+    dados_scraping.append([cve_informado,titulo.text, descricao.text ,severity,hyperlink['href'],known, data.text,link['href']])
 
-dados = pd.DataFrame(dados_scraping, columns=['Título', 'Link', 'Descrição', 'Data'])
+driver.back()
+
+dados = pd.DataFrame(dados_scraping, columns=['Software/Sistema','CVE','Current Description','Severity','References to Advisories,Solutions, and Tools','Know Affected Software Configurations','NVD Published Date','Link para o respectivo CVE'])
 dados.to_excel('webScraping.xlsx', index=False)
 
 #Configurar e-mail e senha
-EMAIL_ADDRESS = 'luccalpc@gmail.com'
+EMAIL_ADDRESS = 'timetigerpython@gmail.com'
 EMAIL_PASSWORD = senha
 
 fromaddr = EMAIL_ADDRESS
@@ -98,7 +117,7 @@ msg['Subject'] = "CVEs encontradas"
 body = "Segue em anexo as CVEs encontradas na pesquisa"
 msg.attach(MIMEText(body, 'plain'))
 filename = "webScraping.xlsx"
-attachment = open("C:\\Users\lenovo\\Documents\\Desafio Python Web Scraping\\webScraping.xlsx", "rb")
+attachment = open("C:\\Users\lenovo\\Documents\\WebScraping\\Desafio Python Web Scraping\\webScraping.xlsx", "rb")
 p = MIMEBase('application', 'octet-stream')
 p.set_payload((attachment).read())
 encoders.encode_base64(p)
