@@ -60,49 +60,47 @@ numero = 0
 
 while numero <= fim_contagem:
 
-    '''severidade = ""
+    severidade = ""
+    numero_string = str(numero)
     cves = site.find('tr', attrs={'data-testid': 'vuln-row-' + str(numero)})
+    lista = []
+    lista_cves = lista.append(cves)
     severity = cves.find('a', attrs={'data-testid': 'vuln-cvss3-link-' + str(numero)})
 
     if (severity):
         severity = cves.find('a', attrs={'data-testid': 'vuln-cvss3-link-' + str(numero)})
         severity = (severity.text).split(" ")[0]
-    if float(severity) >=7:
-        severidade=severity'''
+        if float(severity) >=7:
+            severidade=severity
 
-    numero_string = str(numero)
-    cves = site.find('tr', attrs={'data-testid': 'vuln-row-' + str(numero)})
-    lista = []
-    lista_cves = lista.append(cves)
-    titulo = cves.find('a', attrs={'data-testid': 'vuln-detail-link-' + str(numero)})
-    link = cves.find('a', attrs={'data-testid': 'vuln-detail-link-' + str(numero)})
-    descricao = cves.find('p', attrs={'data-testid': 'vuln-summary-' + str(numero)})
-    data = cves.find('span', attrs={'data-testid': 'vuln-published-on-' + str(numero)})
-    
+            titulo = cves.find('a', attrs={'data-testid': 'vuln-detail-link-' + str(numero)})
+            link = cves.find('a', attrs={'data-testid': 'vuln-detail-link-' + str(numero)})
+            descricao = cves.find('p', attrs={'data-testid': 'vuln-summary-' + str(numero)})
+            data = cves.find('span', attrs={'data-testid': 'vuln-published-on-' + str(numero)})
+            
 
-    
+            
 
-    # Clicou em cima da CVE e vai nos detalhes da CVE
-    segunda_pag = navegador.find_element(by=By.LINK_TEXT, value=titulo.text)
-    segunda_pag.click()
+            # Clicou em cima da CVE e vai nos detalhes da CVE
+            segunda_pag = navegador.find_element(by=By.LINK_TEXT, value=titulo.text)
+            segunda_pag.click()
 
-    #Itens da página da CVE específica
-    navegador_url = navegador.current_url
-    site_page_2 = BeautifulSoup(page_content, 'html.parser')
-    hyperlink = site_page_2.find('tr', attrs={'data-testid': 'vuln-hyperlinks-row-0'})
+            #Itens da página da CVE específica
+            navegador_url = navegador.current_url
+            site_page_2 = BeautifulSoup(page_content, 'html.parser')
+            hyperlink = site_page_2.find('tr', attrs={'data-testid': 'vuln-hyperlinks-row-0'})
 
 
-    #known = navegador.find_element('b', attrs={'data-testid': 'vuln-software-cpe-1-0-0'})
-    #known = ""
-    navegador.back()
+            #known = navegador.find_element('b', attrs={'data-testid': 'vuln-software-cpe-1-0-0'})
+            #known = ""
+            navegador.back()
 
-    #sleep(5000)
-    
-    numero = numero + 1
-    
-    #dados_scraping.append([cve_informado,titulo.text, descricao.text ,severity,hyperlink['href'],known, data.text,link['href']])
-    
-    dados_scraping.append([cve_informado,titulo.text, descricao.text ,"", hyperlink,"", data.text,home+link['href']])
+            #sleep(5000)
+            
+        numero = numero + 1
+            
+            
+        dados_scraping.append([cve_informado,titulo.text, descricao.text ,severidade, hyperlink,"", data.text,home+link['href']])
 
 dados = pd.DataFrame(dados_scraping, columns=['Software/Sistema','CVE','Current Description','Severity','References to Advisories,Solutions, and Tools','Know Affected Software Configurations','NVD Published Date','Link para o respectivo CVE'])
 dados.to_excel('webScraping.xlsx', index=False)
