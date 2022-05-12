@@ -151,3 +151,9 @@ s.login(fromaddr, senha)
 text = msg.as_string()
 s.sendmail(fromaddr, toaddr, text)
 s.quit()
+
+ 
+
+
+
+       
