@@ -1,5 +1,7 @@
 from fileinput import filename
 from math import fabs
+from re import A
+from attr import attrs
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -13,6 +15,9 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.message import EmailMessage
 from email import encoders
+from tiger_pass import senha
+from selenium.webdriver.common.by import By
+
 
 
 
@@ -26,26 +31,26 @@ sleep(2)
 
 site = BeautifulSoup(navegador.page_source, 'html.parser')
 
-caixa_advanced = navegador.find_element_by_id('SearchTypeAdvanced')
+caixa_advanced = navegador.find_element(By.ID, 'SearchTypeAdvanced')
 caixa_advanced.click()
 
-cve_input = navegador.find_element_by_id("Keywords")
+cve_input = navegador.find_element(By.ID, "Keywords")
 cve_informado = input("Digite a CVE desejada para pesquisa: ")
 cve_input.send_keys(cve_informado)
 
-data_inicio = navegador.find_element_by_id("published-start-date")
+data_inicio = navegador.find_element(By.ID, "published-start-date")
 data_informada_inicio = input("Informe a data de início [mm/dd/yyyy]: ")
 data_inicio.send_keys(data_informada_inicio)
 
 
-data_fim = navegador.find_element_by_id("published-end-date")
+data_fim = navegador.find_element(By.ID, "published-end-date")
 data_informada_fim = input("Informe a data de término [mm/dd/yyyy]: ")
 data_fim.send_keys(data_informada_fim)
 
 email_informado = input("Digite o e-mail para serem enviadas as CVEs encontradas: ")
 
 
-pesquisar = navegador.find_element_by_id("vuln-search-submit")
+pesquisar = navegador.find_element(By.ID, "vuln-search-submit")
 pesquisar.click()
 
 sleep(2)
@@ -77,15 +82,50 @@ while numero <= fim_contagem:
 
     data = cves.find('span', attrs={'data-testid': 'vuln-published-on-' + str(numero)})
 
+    severity = cves.find('a', attrs={'data-testid': 'vuln-cvss3-link-' + str(numero)})
+
+    if (severity):
+        severity = cves.find('a', attrs={'data-testid': 'vuln-cvss3-link-' + str(numero)})
+    else:
+        severity = " "
+
+    # Clicou em cima da CVE e vai nos detalhes da CVE
+
+    segunda_pag = navegador.find_element(by=By.LINK_TEXT, value=titulo.text)
+    segunda_pag.click()
+
+    #Itens da página da CVE específica
+
+    navegador_url = navegador.current_url
+    site_page_2 = BeautifulSoup(page_content, 'html.parser')
+
+    hyperlink = site_page_2.find('tr', attrs={'data-testid': 'vuln-hyperlinks-row-0'})
+    '''td = hyperlink.find('td')
+    a = td.find('a')
+    print(a['href'])'''
+
+    #known = navegador.find_element('b', attrs={'data-testid': 'vuln-software-cpe-1-0-0'})
+    known = ""
+
+
+    navegador.back()
+
+    #sleep(5000)
+
     numero = numero + 1
 
-    dados_scraping.append([titulo.text, link['href'], descricao.text, data.text])
+    #dados_scraping.append([cve_informado,titulo.text, descricao.text ,severity,hyperlink['href'],known, data.text,link['href']])
+    dados_scraping.append([cve_informado,titulo.text, descricao.text ,"", hyperlink,"", data.text,link['href']])
 
-dados = pd.DataFrame(dados_scraping, columns=['Título', 'Link', 'Descrição', 'Data'])
+
+dados = pd.DataFrame(dados_scraping, columns=['Software/Sistema','CVE','Current Description','Severity','References to Advisories,Solutions, and Tools','Know Affected Software Configurations','NVD Published Date','Link para o respectivo CVE'])
 dados.to_excel('webScraping.xlsx', index=False)
 
+
+
+
 #Configurar e-mail e senha
-EMAIL_ADDRESS = 'luccalpc@gmail.com'
+EMAIL_ADDRESS = 'timetigerpython@gmail.com'
 EMAIL_PASSWORD = senha
 
 fromaddr = EMAIL_ADDRESS
@@ -98,7 +138,7 @@ msg['Subject'] = "CVEs encontradas"
 body = "Segue em anexo as CVEs encontradas na pesquisa"
 msg.attach(MIMEText(body, 'plain'))
 filename = "webScraping.xlsx"
-attachment = open("C:\\Users\lenovo\\Documents\\Desafio Python Web Scraping\\webScraping.xlsx", "rb")
+attachment = open("C:\\Users\lenovo\\Documents\\WebScraping\\Desafio Python Web Scraping\\webScraping.xlsx", "rb")
 p = MIMEBase('application', 'octet-stream')
 p.set_payload((attachment).read())
 encoders.encode_base64(p)
@@ -111,15 +151,3 @@ s.login(fromaddr, senha)
 text = msg.as_string()
 s.sendmail(fromaddr, toaddr, text)
 s.quit()
-
-
-   
-
-#sleep(5000)
-
-
- 
-
-
-
-       
