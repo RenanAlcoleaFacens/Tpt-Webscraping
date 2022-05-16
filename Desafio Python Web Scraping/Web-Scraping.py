@@ -19,6 +19,7 @@ from tiger_pass import senha
 from selenium.webdriver.common.by import By
 from datetime import date
 import re
+from openpyxl import workbook,load_workbook
 
 options = Options()
 options.add_argument('window-size=800,1200')
@@ -119,6 +120,15 @@ tabela=dados.copy()
 segundo_excell = pd.DataFrame(tabela, columns=['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE'])
 segundo_excell.to_excel('webscrap.xlsx', index=False)
 tabela = pd.read_excel("webscrap.xlsx")
+
+'''planilha=load_workbook("webscrap.xlsx")
+aba_ativa=planilha.active
+for celula in aba_ativa["C"]:
+    if (celula.value) >=7:
+        linha=celula.row
+    else:
+        continue
+planilha.save("webscrap.xlsx", index=False)    '''    
 
 #Configurar e-mail e senha
 EMAIL_ADDRESS = 'timetigerpython@gmail.com'
