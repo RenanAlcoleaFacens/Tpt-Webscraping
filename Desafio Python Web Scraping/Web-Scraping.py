@@ -21,6 +21,7 @@ from datetime import date
 
 options = Options()
 options.add_argument('window-size=800,1200')
+#options.add_argument("--headless")
 
 home = ("https://nvd.nist.gov/")
 navegador = webdriver.Chrome(options=options)
@@ -34,6 +35,7 @@ caixa_advanced.click()
 
 cve_input = navegador.find_element(By.ID, "Keywords")
 cve_informado = input("Digite a CVE desejada para pesquisa: ")
+cve_informado=cve_informado.upper()
 cve_input.send_keys(cve_informado)
 
 data_inicio = navegador.find_element(By.ID, "published-start-date")
@@ -95,6 +97,8 @@ while numero <= fim_contagem:
     #known = navegador.find_element('b', attrs={'data-testid': 'vuln-software-cpe-1-0-0'})
     #known = ""
     navegador.back()
+    
+    numero= numero+1
 
     #sleep(5000)
     
@@ -106,6 +110,14 @@ while numero <= fim_contagem:
 
 dados = pd.DataFrame(dados_scraping, columns=['Software/Sistema','CVE','Current Description','Severity','References to Advisories,Solutions, and Tools','Know Affected Software Configurations','NVD Published Date','Link para o respectivo CVE'])
 dados.to_excel('webScraping.xlsx', index=False)
+
+print("Pesquisa concluída!\nEstamos enviando as informações para o email informado")
+
+#Tabela para o Body do email
+tabela=dados.copy()
+segundo_excell = pd.DataFrame(tabela, columns=['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE'])
+segundo_excell.to_excel('webscrap.xlsx', index=False)
+tabela = pd.read_excel("webscrap.xlsx")
 
 #Configurar e-mail e senha
 EMAIL_ADDRESS = 'timetigerpython@gmail.com'
