@@ -5,6 +5,8 @@ from attr import attrs
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from tiger_pass import senha
+from funcoes import *
 
 
 #software = input('Digite qual a vulnerabilidade que gostaria de procurar: ')
@@ -69,55 +71,25 @@ else:
     descInput = tableContent.find('p',attrs={'data-testid': 'vuln-summary-0'}).getText()
 
     #Obtendo o quarto elemento da Lista final (Severidade)
+    #navegador.get('https://nvd.nist.gov/vuln/detail/CVE-2022-25157')
     navegador.get('https://nvd.nist.gov/vuln/detail/'+cveInput)
     sleep(2)
     siteSP = BeautifulSoup(navegador.page_source,'html.parser')
-    if siteSP.find('a',attrs={'id': 'Cvss3NistCalculatorAnchor'}):
-        severity_Input = siteSP.find('a',attrs={'id': 'Cvss3NistCalculatorAnchor'}).getText()   
-    else:
-        severity_Input = 'N/A'    
+    severity_Input = busca_severity(siteSP)   
 
     #Obtendo o quinto elemento da Lista final (Referências)
-    reference_Input = siteSP.find('td',attrs={'data-testid':'vuln-hyperlinks-link-0'}).getText()
-
+    reference_Input = busca_links(siteSP)
     #Obtendo o sexto elemento da Lista final (Knowledge Affected System)
-    print('\n\n\n\n')
-    qtdVuln = siteSP.find('tr',attrs={'class':'vulnerable'})
-    print(len(qtdVuln))
-    qtdnonVuln = siteSP.find('tr',attrs={'class':'nonVulnerable'})    
-    print(qtdnonVuln)
-    kas_Input = ''
-
-    """
-    if siteSP.find('tr',attrs={'class':'Vulnerable'}):
-        for i in range(0,len(qtdVuln)):
-            if siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-1-0-0'}):            
-                kas_Input = kas_Input + ' ' + siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-1-0-'+str(i)}).getText()  
-            elif siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-1-0-0-0'}):   
-                kas_Input = kas_Input + ' ' + siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-1-0-0-'+str(i)}).getText()  
-
-    if siteSP.find('tr',attrs={'class':'nonVulnerable'}):
-        for i in range(0,len(qtdnonVuln)):
-            if siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-1-0-0'}):  
-                kas_Input = kas_Input + ' ' + siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-1-'+str(i)+'-0'}).getText()  
-            elif siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-1-0-0-0'}):    
-                kas_Input = kas_Input + ' ' + siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-1-0-'+str(i)+'-0'}).getText()  
-   """
-
+    kasc_Input = busca_kasc(siteSP)  
     #Obtendo o setimo elemento da Lista final (Data de Publicação)
-    publish_Input = siteSP.find('span',attrs={'data-testid':'vuln-published-on'}).getText()
-
+    publish_Input = busca_publish(siteSP)
     #Obtendo o oitavo elemento da Lista final (Link CVE)
-    details_Input = 'https://nvd.nist.gov/vuln/detail/'+cveInput
+    details_Input = busca_details(cveInput)
 
-
-    listResult = [software,cveInput,descInput,severity_Input,reference_Input,kas_Input,publish_Input,details_Input]
+    listResult = [software,cveInput,descInput,severity_Input,reference_Input,kasc_Input,publish_Input,details_Input]
 
     #Exibindo lista
     print(listResult)
-    
-
-
 
     #Montando a estrutura do Dataframe com Pandas
     df = pd.DataFrame(data = [listResult],columns=['Software/Sistema','CVE','Current Description', 'Severity',

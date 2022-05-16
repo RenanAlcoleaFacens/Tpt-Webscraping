@@ -2,7 +2,6 @@ from fileinput import filename
 from math import fabs
 from re import A
 from attr import attrs
-import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
