@@ -18,9 +18,11 @@ from email import encoders
 from tiger_pass import senha
 from selenium.webdriver.common.by import By
 from datetime import date
+import re
 
 options = Options()
 options.add_argument('window-size=800,1200')
+#options.add_argument("--headless")
 
 home = ("https://nvd.nist.gov/")
 navegador = webdriver.Chrome(options=options)
@@ -42,8 +44,15 @@ data_inicio.send_keys(data_informada_inicio)
 data_fim = navegador.find_element(By.ID, "published-end-date")
 data_informada_fim = input("Informe a data de término [mm/dd/yyyy]: ")
 data_fim.send_keys(data_informada_fim)
-email_informado = input("Digite o e-mail para serem enviadas as CVEs encontradas: ")
 
+#Validar email
+padrao = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+while True:
+    email_informado = input("Digite um e-mail válido para serem enviadas as CVEs encontradas: ")
+    if (re.search(padrao,email_informado)) :
+        print("Email válido")
+        break
+    
 pesquisar = navegador.find_element(By.ID, "vuln-search-submit")
 pesquisar.click()
 
@@ -58,52 +67,53 @@ fim_contagem = site.find('strong', attrs={'data-testid': 'vuln-displaying-count-
 fim_contagem = int(fim_contagem) - 1
 numero = 0
 
+
 while numero <= fim_contagem:
 
-    severidade = ""
-    numero_string = str(numero)
+    
     cves = site.find('tr', attrs={'data-testid': 'vuln-row-' + str(numero)})
-    lista = []
-    lista_cves = lista.append(cves)
     severity = cves.find('a', attrs={'data-testid': 'vuln-cvss3-link-' + str(numero)})
-
     if (severity):
-        severity = cves.find('a', attrs={'data-testid': 'vuln-cvss3-link-' + str(numero)})
         severity = (severity.text).split(" ")[0]
-        if float(severity) >=7:
-            severidade=severity
+        severity = float(severity)
 
-            titulo = cves.find('a', attrs={'data-testid': 'vuln-detail-link-' + str(numero)})
-            link = cves.find('a', attrs={'data-testid': 'vuln-detail-link-' + str(numero)})
-            descricao = cves.find('p', attrs={'data-testid': 'vuln-summary-' + str(numero)})
-            data = cves.find('span', attrs={'data-testid': 'vuln-published-on-' + str(numero)})
-            
-
-            
-
-            # Clicou em cima da CVE e vai nos detalhes da CVE
-            segunda_pag = navegador.find_element(by=By.LINK_TEXT, value=titulo.text)
-            segunda_pag.click()
-
-            #Itens da página da CVE específica
-            navegador_url = navegador.current_url
-            site_page_2 = BeautifulSoup(page_content, 'html.parser')
-            hyperlink = site_page_2.find('tr', attrs={'data-testid': 'vuln-hyperlinks-row-0'})
+    cves = site.find('tr', attrs={'data-testid': 'vuln-row-' + str(numero)})
+    titulo = cves.find('a', attrs={'data-testid': 'vuln-detail-link-' + str(numero)})
+    link = cves.find('a', attrs={'data-testid': 'vuln-detail-link-' + str(numero)})
+    descricao = cves.find('p', attrs={'data-testid': 'vuln-summary-' + str(numero)})
+    data = cves.find('span', attrs={'data-testid': 'vuln-published-on-' + str(numero)})
+    link_completo = home+link['href']
+    
 
 
-            #known = navegador.find_element('b', attrs={'data-testid': 'vuln-software-cpe-1-0-0'})
-            #known = ""
-            navegador.back()
+    # Clicou em cima da CVE e vai nos detalhes da CVE
+    segunda_pag = navegador.find_element(by=By.LINK_TEXT, value=titulo.text)
+    segunda_pag.click()
 
-            #sleep(5000)
-            
-        numero = numero + 1
-            
-            
-        dados_scraping.append([cve_informado,titulo.text, descricao.text ,severidade, hyperlink,"", data.text,home+link['href']])
+    #Itens da página da CVE específica
+    navegador_url = navegador.current_url
+    site_page_2 = BeautifulSoup(page_content, 'html.parser')
+    hyperlink = site_page_2.find('tr', attrs={'data-testid': 'vuln-hyperlinks-row-0'})
+
+
+    
+    #known = navegador.find_element('b', attrs={'data-testid': 'vuln-software-cpe-1-0-0'})
+    #known = ""
+    navegador.back()
+    
+    numero= numero+1
+
+    dados_scraping.append([cve_informado,titulo.text, descricao.text ,severity, hyperlink,"", data.text,link_completo])
 
 dados = pd.DataFrame(dados_scraping, columns=['Software/Sistema','CVE','Current Description','Severity','References to Advisories,Solutions, and Tools','Know Affected Software Configurations','NVD Published Date','Link para o respectivo CVE'])
 dados.to_excel('webScraping.xlsx', index=False)
+
+tabela = pd.read_excel("webScraping.xlsx")
+'''if tabela["Sverity"]>=7:
+    body = (f"Segue as informações da pesquisa:\n Sistema/Software utilizado: {tabela['Software/Sistema']}; CVES classificadas como altas:{tabela['CVE']}, nota: {tabela['Severity']}; Data da publicação:{tabela['NVD Published Date']}; Link da pesquisa: {tabela['Link para o respectivo CVE']}.")
+'''
+tabela_full=[]
+tabela_full.append(tabela['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE'])
 
 #Configurar e-mail e senha
 EMAIL_ADDRESS = 'timetigerpython@gmail.com'
@@ -114,7 +124,8 @@ msg = MIMEMultipart()
 msg['From'] = fromaddr
 msg['To'] = toaddr
 msg['Subject'] = ("Vulnerabilidades Críticas, Data: ")
-body = "Segue em anexo as CVEs encontradas na pesquisa"
+body = (f"todas{tabela_full}!")
+#body = (f"Segue as informações da pesquisa:\n Sistema/Software utilizado: {tabela['Software/Sistema']}; CVES classificadas como altas:{tabela['CVE']}, nota: {tabela['Severity']}; Data da publicação:{tabela['NVD Published Date']}; Link da pesquisa: {tabela['Link para o respectivo CVE']}.")
 msg.attach(MIMEText(body, 'plain'))
 filename = "webScraping.xlsx"
 attachment = open("C:\\Users\lenovo\\Documents\\WebScraping\\Desafio Python Web Scraping\\webScraping.xlsx", "rb")
@@ -129,3 +140,5 @@ s.login(fromaddr, senha)
 text = msg.as_string()
 s.sendmail(fromaddr, toaddr, text)
 s.quit()
+
+
