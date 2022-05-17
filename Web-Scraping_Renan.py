@@ -14,12 +14,12 @@ software = 'microsoft'
 #startDate_input = input('Informe qual a data de Início: ')
 startDate_input = '02/01/2022'
 #endDate_input = input('Informe qual a data Final: ')
-endDate_input = '02/28/2022'
+endDate_input = '02/07/2022'
 
 #Parâmetros de Opções do Webdriver do Chrome 
 options = Options()
 options.add_argument('window-size=800,1000')
-options.add_argument('--headless')
+#options.add_argument('--headless')
 
 #Definindo o navegador através do Webdriver e inicializando com parâmetros de um objetos da classe "Option"
 navegador = webdriver.Chrome(options=options)
@@ -29,24 +29,24 @@ navegador.get('https://nvd.nist.gov/vuln/search')
 sleep(2)
 
 #Seleciona o tipo de Busca como Avançado
-advanced = navegador.find_element_by_id('SearchTypeAdvanced')
+advanced = navegador.find_element(By.ID,'SearchTypeAdvanced')
 advanced.click()
 
 #Seleciona a caixa de pesquisa da vulnerabilidade e digita a String passada pelo usuário
-keywords = navegador.find_element_by_id('Keywords')
+keywords = navegador.find_element(By.ID,'Keywords')
 keywords.send_keys(software)
 
 #Definindo Range de Início da busca
-startDate = navegador.find_element_by_id('published-start-date')
+startDate = navegador.find_element(By.ID,'published-start-date')
 startDate.send_keys(startDate_input)
 
 #Definindo Range Final da busca
-endDate = navegador.find_element_by_id('published-end-date')
+endDate = navegador.find_element(By.ID,'published-end-date')
 endDate.send_keys(endDate_input)
 
-submitBtn = navegador.find_element_by_id('vuln-search-submit')
+#Selecionando o botão de Search
+submitBtn = navegador.find_element(By.ID,'vuln-search-submit')
 submitBtn.click()
-
 
 sleep(2)
 
@@ -55,7 +55,7 @@ siteFP = BeautifulSoup(navegador.page_source,'html.parser')
 tableContent = siteFP.find('table', attrs={'data-testid': 'vuln-results-table'})
 headContent =  siteFP.find('div', attrs={'id': 'body-section'})
 
-fim_contagem = int(siteFP.find('strong', attrs={'data-testid': 'vuln-displaying-count-through'}).text)
+
 listFull = []
 
 #Verifica a quantidade de páginas das CVE
@@ -66,14 +66,25 @@ else:
     pages = qtd_result//20
 
 ########################################################################################################################################################
-
-for j in range (pages):
-
-    for i in range (fim_contagem):
+for j in range (pages):    
+    newsiteFP = BeautifulSoup(navegador.page_source,'html.parser')
+    
+    # Calcula a quantidade de itens da página atual
+    if qtd_result <= 20:
+        fim_contagem = qtd_result
+    elif j == pages-1:
+        fim_contagem = qtd_result - 20 * j        
+    else:
+        fim_contagem = 20    
+    
+    for i in range (fim_contagem):                  
+        
+        tableContent = newsiteFP.find('table', attrs={'data-testid': 'vuln-results-table'})
+        headContent =  newsiteFP.find('div', attrs={'id': 'body-section'})
 
         #Criação da Lista de CVE e Informações
         listResult =[]
-
+        
         if  headContent.find('strong',attrs={'data-testid': 'vuln-matching-records-count'}).get_text() == '0':
             print('Não existem falhas para este período informado')
 
@@ -84,8 +95,7 @@ for j in range (pages):
             #Obtendo o terceiro elemento da Lista final (Descrição)
             descInput = tableContent.find('p',attrs={'data-testid': 'vuln-summary-'+str(i)}).getText()
 
-            #Obtendo o quarto elemento da Lista final (Severidade)
-            #navegador.get('https://nvd.nist.gov/vuln/detail/CVE-2022-25157')
+            #Obtendo o quarto elemento da Lista final (Severidade)            
             navegador.get('https://nvd.nist.gov/vuln/detail/'+cveInput)
             sleep(2)
             siteSP = BeautifulSoup(navegador.page_source,'html.parser')
@@ -99,15 +109,15 @@ for j in range (pages):
             publish_Input = busca_publish(siteSP)
             #Obtendo o oitavo elemento da Lista final (Link CVE)
             details_Input = busca_details(cveInput)
-
+            
             listResult = [software,cveInput,descInput,severity_Input,reference_Input,kasc_Input,publish_Input,details_Input]        
-            listFull.append(listResult)
-            navegador.back()        
-
-
-#nextBtn = navegador.find_element(by=By.CLASS_NAME, value='col-sm-12 col-lg-5')[-2]
-#print(nextBtn)     
-
+            listFull.append(listResult)           
+            navegador.back() 
+    
+    if j < pages-1 and qtd_result >20:
+        nextBtn = navegador.find_element(By.LINK_TEXT,'>')
+        nextBtn.click()
+    
 
 ########################################################################################################################################################
 
