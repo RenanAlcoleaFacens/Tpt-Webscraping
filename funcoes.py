@@ -7,8 +7,6 @@ def busca_severity(siteSP):
         severity_Input = 'N/A' 
     return severity_Input 
 
-
-
 #Função que retorna os Hyperlinks do CVE (5º Item da lista)
 def busca_links(pagina_resultadoCVE_BS,hyperlink_RefExt=0,links_impresso=0,i=0,counter=0):    
     
@@ -41,7 +39,7 @@ def busca_kasc(pagina_resultadoCVE_BS,KASC=0,kasc_impresso=0,i=0,counter=0):
         KASC.append(pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}).get_text()[2:])
     else:
         KASC.append(pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}).get_text()[2:])
-    kasc_impresso = kasc_impresso + str(KASC[i]) + ', '
+    kasc_impresso = kasc_impresso + ', ' + str(KASC[i]) 
     i=i+1    
     
     if i == counter:

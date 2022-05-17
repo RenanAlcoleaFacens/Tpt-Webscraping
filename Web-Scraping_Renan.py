@@ -10,7 +10,7 @@ from funcoes import *
 
 
 #software = input('Digite qual a vulnerabilidade que gostaria de procurar: ')
-software = 'apache'
+software = 'microsoft'
 #startDate_input = input('Informe qual a data de Início: ')
 startDate_input = '02/01/2022'
 #endDate_input = input('Informe qual a data Final: ')
@@ -55,45 +55,65 @@ siteFP = BeautifulSoup(navegador.page_source,'html.parser')
 tableContent = siteFP.find('table', attrs={'data-testid': 'vuln-results-table'})
 headContent =  siteFP.find('div', attrs={'id': 'body-section'})
 
+fim_contagem = int(siteFP.find('strong', attrs={'data-testid': 'vuln-displaying-count-through'}).text)
+listFull = []
 
-#Criação da Lista de CVE e Informações
-listResult =[]
-
-
-if  headContent.find('strong',attrs={'data-testid': 'vuln-matching-records-count'}).get_text() == '0':
-    print('Não existem falhas para este período informado')
-
+#Verifica a quantidade de páginas das CVE
+qtd_result = int(siteFP.find('strong',attrs={'data-testid':'vuln-matching-records-count'}).getText())
+if qtd_result%20 > 0:
+    pages = (qtd_result//20)+1
 else:
-    #Obtendo segundo elemento da Lista final (CVE)
-    cveInput = tableContent.find('a',attrs={'data-testid': 'vuln-detail-link-0'}).getText()
+    pages = qtd_result//20
 
-    #Obtendo o terceiro elemento da Lista final (Descrição)
-    descInput = tableContent.find('p',attrs={'data-testid': 'vuln-summary-0'}).getText()
+########################################################################################################################################################
 
-    #Obtendo o quarto elemento da Lista final (Severidade)
-    #navegador.get('https://nvd.nist.gov/vuln/detail/CVE-2022-25157')
-    navegador.get('https://nvd.nist.gov/vuln/detail/'+cveInput)
-    sleep(2)
-    siteSP = BeautifulSoup(navegador.page_source,'html.parser')
-    severity_Input = busca_severity(siteSP)   
+for j in range (pages):
 
-    #Obtendo o quinto elemento da Lista final (Referências)
-    reference_Input = busca_links(siteSP)
-    #Obtendo o sexto elemento da Lista final (Knowledge Affected System)
-    kasc_Input = busca_kasc(siteSP)  
-    #Obtendo o setimo elemento da Lista final (Data de Publicação)
-    publish_Input = busca_publish(siteSP)
-    #Obtendo o oitavo elemento da Lista final (Link CVE)
-    details_Input = busca_details(cveInput)
+    for i in range (fim_contagem):
 
-    listResult = [software,cveInput,descInput,severity_Input,reference_Input,kasc_Input,publish_Input,details_Input]
+        #Criação da Lista de CVE e Informações
+        listResult =[]
 
-    #Exibindo lista
-    print(listResult)
+        if  headContent.find('strong',attrs={'data-testid': 'vuln-matching-records-count'}).get_text() == '0':
+            print('Não existem falhas para este período informado')
 
-    #Montando a estrutura do Dataframe com Pandas
-    df = pd.DataFrame(data = [listResult],columns=['Software/Sistema','CVE','Current Description', 'Severity',
-    'References to Advisories, Solutions, and Tools','Known Affected Softwares Configuration','NVD Published Date','Link para o respectivo CVE'])
+        else:
+            #Obtendo segundo elemento da Lista final (CVE)
+            cveInput = tableContent.find('a',attrs={'data-testid': 'vuln-detail-link-'+str(i)}).getText()
 
-    #Gerando o arquivo do Excel a partir do Dataframe
-    df.to_excel('Relatório de Vulnerabilidades - CVE.xlsx',sheet_name='Vulnerabilidades - CVE',header=True,index=False)
+            #Obtendo o terceiro elemento da Lista final (Descrição)
+            descInput = tableContent.find('p',attrs={'data-testid': 'vuln-summary-'+str(i)}).getText()
+
+            #Obtendo o quarto elemento da Lista final (Severidade)
+            #navegador.get('https://nvd.nist.gov/vuln/detail/CVE-2022-25157')
+            navegador.get('https://nvd.nist.gov/vuln/detail/'+cveInput)
+            sleep(2)
+            siteSP = BeautifulSoup(navegador.page_source,'html.parser')
+            severity_Input = busca_severity(siteSP)   
+
+            #Obtendo o quinto elemento da Lista final (Referências)
+            reference_Input = busca_links(siteSP)
+            #Obtendo o sexto elemento da Lista final (Knowledge Affected System)
+            kasc_Input = busca_kasc(siteSP)  
+            #Obtendo o setimo elemento da Lista final (Data de Publicação)
+            publish_Input = busca_publish(siteSP)
+            #Obtendo o oitavo elemento da Lista final (Link CVE)
+            details_Input = busca_details(cveInput)
+
+            listResult = [software,cveInput,descInput,severity_Input,reference_Input,kasc_Input,publish_Input,details_Input]        
+            listFull.append(listResult)
+            navegador.back()        
+
+
+#nextBtn = navegador.find_element(by=By.CLASS_NAME, value='col-sm-12 col-lg-5')[-2]
+#print(nextBtn)     
+
+
+########################################################################################################################################################
+
+#Montando a estrutura do Dataframe com Pandas
+df = pd.DataFrame(data = listFull,columns=['Software/Sistema','CVE','Current Description', 'Severity',
+'References to Advisories, Solutions, and Tools','Known Affected Softwares Configuration','NVD Published Date','Link para o respectivo CVE'])
+
+#Gerando o arquivo do Excel a partir do Dataframe
+df.to_excel('Relatório de Vulnerabilidades - CVE.xlsx',sheet_name='Vulnerabilidades - CVE',header=True,index=False)
