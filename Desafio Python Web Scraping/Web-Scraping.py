@@ -2,6 +2,7 @@ from fileinput import filename
 from math import fabs
 from re import A
 from attr import attrs
+from numpy import empty
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -20,6 +21,7 @@ from selenium.webdriver.common.by import By
 from datetime import date
 import re
 from openpyxl import workbook,load_workbook
+
 
 options = Options()
 options.add_argument('window-size=800,1200')
@@ -80,7 +82,7 @@ while numero <= fim_contagem:
     severity = cves.find('a', attrs={'data-testid': 'vuln-cvss3-link-' + str(numero)})
     if (severity):
         severity = (severity.text).split(" ")[0]
-        #severity = float(severity)
+        severity = float(severity)
 
     cves = site.find('tr', attrs={'data-testid': 'vuln-row-' + str(numero)})
     titulo = cves.find('a', attrs={'data-testid': 'vuln-detail-link-' + str(numero)})
@@ -100,15 +102,13 @@ while numero <= fim_contagem:
     site_page_2 = BeautifulSoup(page_content, 'html.parser')
     hyperlink = site_page_2.find('tr', attrs={'data-testid': 'vuln-hyperlinks-row-0'})
 
-
     
-    #known = navegador.find_element('b', attrs={'data-testid': 'vuln-software-cpe-1-0-0'})
-    #known = ""
+    kasc=''
     navegador.back()
     
     numero= numero+1
 
-    dados_scraping.append([cve_informado,titulo.text, descricao.text ,severity, hyperlink,"", data.text,link_completo])
+    dados_scraping.append([cve_informado,titulo.text, descricao.text ,severity, hyperlink,kasc, data.text,link_completo])
 
 dados = pd.DataFrame(dados_scraping, columns=['Software/Sistema','CVE','Current Description','Severity','References to Advisories,Solutions, and Tools','Know Affected Software Configurations','NVD Published Date','Link para o respectivo CVE'])
 dados.to_excel('webScraping.xlsx', index=False)
@@ -121,14 +121,10 @@ segundo_excell = pd.DataFrame(tabela, columns=['Software/Sistema','CVE','Severit
 segundo_excell.to_excel('webscrap.xlsx', index=False)
 tabela = pd.read_excel("webscrap.xlsx")
 
-'''planilha=load_workbook("webscrap.xlsx")
-aba_ativa=planilha.active
-for celula in aba_ativa["C"]:
-    if (celula.value) >=7:
-        linha=celula.row
-    else:
-        continue
-planilha.save("webscrap.xlsx", index=False)    '''    
+#Retira valores menores que 7 da tabela
+tabela.loc[tabela["Severity"]<7 ,['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE']]= None
+tabela = pd.DataFrame(tabela.dropna(how="any"))
+tabela=tabela.set_index(".")
 
 #Configurar e-mail e senha
 EMAIL_ADDRESS = 'timetigerpython@gmail.com'
