@@ -1,10 +1,36 @@
-#Função que retorna a Severity do CVE (4º Item da lista)
+#Recebendo os dois inpusts como argumento:
+from datetime import datetime
 
+
+def validador_datas():
+    
+    dataBR1 = '01/05/2022'
+    dataBR2 = '16/10/2023'
+
+    # Data Inicial
+    d1 = datetime.strptime(dataBR1, '%d/%m/%Y')
+
+    # Data Final
+    d2 = datetime.strptime(dataBR2, '%d/%m/%Y')
+
+    #Calcula se o período informado é maior que 180 dias:
+    if abs((d2 - d1).days)>180:        
+        print("O período pesquisado não pode ser maior que 180 dias!")
+        return
+    else:
+        dataUS1 = dataBR1[3:6]+dataBR1[0:3]+dataBR1[6:]
+        dataUS2 = dataBR2[3:6]+dataBR2[0:3]+dataBR2[6:]
+        dataUS = [dataUS1,dataUS2]
+    return dataUS
+
+#Função que retorna a Severity do CVE (4º Item da lista)
 def busca_severity(siteSP):    
     if siteSP.find('a',attrs={'id': 'Cvss3NistCalculatorAnchor'}):
-        severity_Input = siteSP.find('a',attrs={'id': 'Cvss3NistCalculatorAnchor'}).getText()        
+        severity_Input = siteSP.find('a',attrs={'id': 'Cvss3NistCalculatorAnchor'}).getText()   
+        severity_Input = str(severity_Input).split(" ")[0]   
+        severity_Input = float(severity_Input)
     else:
-        severity_Input = 'N/A' 
+        severity_Input = 0
     return severity_Input 
 
 #Função que retorna os Hyperlinks do CVE (5º Item da lista)
@@ -18,7 +44,7 @@ def busca_links(pagina_resultadoCVE_BS,links_impresso = 0,i=0,counter=0):
 
     #Executando o comando de separar o link do corpo html através do get_text(), repetindo a qtd de vezes necessária:
     else:
-        links_impresso = links_impresso + ', ' + str(pagina_resultadoCVE_BS.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i)}).get_text())
+        links_impresso = links_impresso + ',' + str(pagina_resultadoCVE_BS.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i)}).get_text())
 
     i=i+1
 
