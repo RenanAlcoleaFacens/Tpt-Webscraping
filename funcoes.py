@@ -6,6 +6,7 @@ from email.mime.base import MIMEBase
 from email.message import EmailMessage
 from email import encoders
 import smtplib
+from h11 import Data
 import pandas as pd
 from tiger_pass import senha    
 
@@ -125,11 +126,12 @@ def envia_email(listFull,email_informado):
     EMAIL_PASSWORD = senha
     fromaddr = EMAIL_ADDRESS
     toaddr = email_informado
-    today = date.today()
+    data=datetime.datetime.now()
+    today=(str(data.day) +"/"+ str(data.month) +"/"+ str(data.year))
     msg = MIMEMultipart()
     msg['From'] = fromaddr
     msg['To'] = toaddr
-    msg['Subject'] = ("Vulnerabilidades Críticas, Data: ")
+    msg['Subject'] = ("Vulnerabilidades Críticas, Data: ") + today
     body = (f"Segue na tabela abaixo as vulnerabilidades classificadas como altas:\n\n{tabela}")
     msg.attach(MIMEText(body, 'plain'))
     filename = "Vulnerabilidades_CVE.xlsx"
