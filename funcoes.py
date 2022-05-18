@@ -1,4 +1,31 @@
+from datetime import datetime
+
 #Função que retorna a Severity do CVE (4º Item da lista)
+
+#Recebendo os dois inpusts como argumento:
+def validador_datas(dataBR1, dataBR2):
+    
+    '''dataBR1 = '01/05/2022'
+    dataBR2 = '16/10/2023'''
+
+    # Data Inicial
+    d1 = datetime.strptime(dataBR1, '%Y-%m-%d')
+
+    # Data Final
+    d2 = datetime.strptime(dataBR2, '%Y-%m-%d')
+
+    #2022/10/04
+
+
+    #Calcula se o período informado é maior que 180 dias:
+    if abs((d2 - d1).days)>180:        
+        print("O período pesquisado não pode ser maior que 180 dias!")
+        return
+    else:
+        dataUS1 = dataBR1[5:7]+ "/" + dataBR1[8:] + "/" + dataBR1[0:4]
+        dataUS2 = dataBR2[5:7]+ "/" + dataBR2[8:] + "/" + dataBR2[0:4]
+        dataUS = [dataUS1,dataUS2]
+    return dataUS
 
 def busca_severity(siteSP):    
     if siteSP.find('a',attrs={'id': 'Cvss3NistCalculatorAnchor'}):
