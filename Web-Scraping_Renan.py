@@ -25,11 +25,11 @@ import re
 from datetime import date
 
 #software = input('Digite qual a vulnerabilidade que gostaria de procurar: ')
-'''software = 'microsoft'
+software = 'microsoft'
 #startDate_input = input('Informe qual a data de Início: ')
 startDate_input = '02/01/2022'
 #endDate_input = input('Informe qual a data Final: ')
-endDate_input = '02/07/2022'''
+endDate_input = '02/07/2022'
 
 #Parâmetros de Opções do Webdriver do Chrome 
 options = Options()
@@ -50,10 +50,10 @@ advanced.click()
 sleep(2)
 
 #Seleciona a caixa de pesquisa da vulnerabilidade e digita a String passada pelo usuário
-keywords = navegador.find_element(By.ID,'Keywords')
-software = input("Digite a CVE desejada para pesquisa: ")
-software=software.upper()
-keywords.send_keys(software)
+#keywords = navegador.find_element(By.ID,'Keywords')
+#software = input("Digite a CVE desejada para pesquisa: ")
+#software=software.upper()
+#keywords.send_keys(software)
 
 #Definindo Range de Início da busca
 datas=validador_datas()
@@ -158,7 +158,7 @@ df = pd.DataFrame(data = listFull,columns=['Software/Sistema','CVE','Current Des
 'References to Advisories, Solutions, and Tools','Known Affected Softwares Configuration','NVD Published Date','Link para o respectivo CVE'])
 
 #Gerando o arquivo do Excel a partir do Dataframe
-df.to_excel('Relatório de Vulnerabilidades - CVE.xlsx',sheet_name='Vulnerabilidades - CVE',header=True,index=False)
+df.to_excel('Vulnerabilidades_CVE.xlsx',sheet_name='Vulnerabilidades - CVE',header=True,index=False)
 
 print("Pesquisa concluída!\nEstamos enviando as informações para o email informado")
 
@@ -186,7 +186,7 @@ msg['Subject'] = ("Vulnerabilidades Críticas, Data: ")
 body = (f"Segue na tabela abaixo as vulnerabilidades classificadas como altas:\n\n{tabela}")
 msg.attach(MIMEText(body, 'plain'))
 filename = "Relatório de Vulnerabilidades - CVE.xlsx"
-attachment = open("C:\\Users\\lenovo\\Documents\\WebScraping\\Relatório de Vulnerabilidades - CVE.xlsx", "rb")
+attachment = open("Vulnerabilidades_CVE.xlsx", "rb")
 p = MIMEBase('application', 'octet-stream')
 p.set_payload((attachment).read())
 encoders.encode_base64(p)
