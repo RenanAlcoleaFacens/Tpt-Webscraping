@@ -3,7 +3,6 @@ from math import fabs
 from re import A
 from attr import attrs
 from numpy import empty
-import requests
 from datetime import datetime
 import pandas as pd
 import os
@@ -24,12 +23,30 @@ from funcoes import *
 import re
 from datetime import date
 
+#Seleciona a caixa de pesquisa da vulnerabilidade e digita a String passada pelo usuário
+#keywords = navegador.find_element(By.ID,'Keywords')
+#software = input("Digite a CVE desejada para pesquisa: ")
+#software=software.upper()
+#keywords.send_keys(software)
+
+'''
+#Validar email
+padrao = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+while True:
+    email_informado = input("Digite um e-mail válido para receber as CVEs encontradas: ")
+    if (re.search(padrao,email_informado)) :
+        print("Email válido")
+        break
+'''
+
 #software = input('Digite qual a vulnerabilidade que gostaria de procurar: ')
 software = 'microsoft'
 #startDate_input = input('Informe qual a data de Início: ')
 startDate_input = '02/01/2022'
 #endDate_input = input('Informe qual a data Final: ')
 endDate_input = '02/07/2022'
+#email_informato = input("Digite um e-mail válido para receber as CVEs encontradas: ")
+email_informado = 'renan.souza@facens.br'
 
 #Parâmetros de Opções do Webdriver do Chrome 
 options = Options()
@@ -49,12 +66,6 @@ advanced.click()
 
 sleep(2)
 
-#Seleciona a caixa de pesquisa da vulnerabilidade e digita a String passada pelo usuário
-#keywords = navegador.find_element(By.ID,'Keywords')
-#software = input("Digite a CVE desejada para pesquisa: ")
-#software=software.upper()
-#keywords.send_keys(software)
-
 #Definindo Range de Início da busca
 datas=validador_datas()
 startDate = navegador.find_element(By.ID,'published-start-date')
@@ -66,13 +77,6 @@ endDate = navegador.find_element(By.ID,'published-end-date')
 endDate_input= input("Informe a data de término [mm/dd/yyyy]: ")
 endDate.send_keys(endDate_input)
 
-#Validar email
-padrao = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
-while True:
-    email_informado = input("Digite um e-mail válido para receber as CVEs encontradas: ")
-    if (re.search(padrao,email_informado)) :
-        print("Email válido")
-        break
 
 #Selecionando o botão de Search
 submitBtn = navegador.find_element(By.ID,'vuln-search-submit')
@@ -96,6 +100,7 @@ else:
     pages = qtd_result//20
 
 print("Iniciando a pesquisa...")
+
 ########################################################################################################################################################
 for j in range (pages):    
     newsiteFP = BeautifulSoup(navegador.page_source,'html.parser')
