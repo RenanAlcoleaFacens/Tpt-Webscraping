@@ -26,14 +26,6 @@ while True:
         print("Email válido")
         break
 '''
-
-#software = input('Digite qual a vulnerabilidade que gostaria de procurar: ')
-#startDate_input = input('Informe qual a data de Início: ')
-#startDate_input = '02/01/2022'
-#endDate_input = input('Informe qual a data Final: ')
-#endDate_input = '02/07/2022'
-#email_informato = input("Digite um e-mail válido para receber as CVEs encontradas: ")
-
 from ssl import AlertDescription
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -55,28 +47,19 @@ app = Flask(__name__)
 def homepage():
     return render_template("homepage.html")
 
-@app.route("/sucesso")
-def sucesso():
-    return render_template("sucesso.html")
-
 @app.route("/pesquisar", methods=['POST'])
 def pesquisar():
     error = None
     try:
-
         software_flask = request.form['software']
         email_flask = request.form['email']
         data_inicio_flask = request.form['dataInicio']
-        data_termino_flask = request.form['dataTermino']
+        data_termino_flask = request.form['dataTermino']        
 
-        
-
+        # Recebe a Data da página HTML e converte no formato do site Nist
         datas = validador_datas(data_inicio_flask, data_termino_flask)
         startDate_input = datas[0]
-        endDate_input = datas[1]
-
-        #software = 'microsoft'
-        #email_informado = 'lucca.campos@facens.br'
+        endDate_input = datas[1]    
 
         #Parâmetros de Opções do Webdriver do Chrome 
         options = Options()
@@ -99,10 +82,7 @@ def pesquisar():
         #Seleciona a caixa de pesquisa da vulnerabilidade e digita a String passada pelo usuário
         software_flask =software_flask.upper()
         keywords = navegador.find_element(By.ID,'Keywords')
-        keywords.send_keys(software_flask)
-
-        
-        
+        keywords.send_keys(software_flask)       
 
         #Definindo Range de Início da busca
         startDate = navegador.find_element(By.ID,'published-start-date')        
@@ -193,6 +173,7 @@ def pesquisar():
 
         #Envio do Email
         envia_email(listFull,email_flask)
+        return "<h1 style='text-align: center; margin-top: 20px;'>Sucesso! <br> Dados enviados para o E-mail informado.</h1>"
     except:
         #return render_template("homepage.html", error = error)
         pag.alert(text="Por favor, preencha novamente os campos.", title="Erro" )
