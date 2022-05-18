@@ -23,13 +23,14 @@ from tiger_pass import senha
 from funcoes import *
 import re
 from datetime import date
+import datetime
 
 #software = input('Digite qual a vulnerabilidade que gostaria de procurar: ')
-'''software = 'microsoft'
+#software = 'microsoft'
 #startDate_input = input('Informe qual a data de Início: ')
-startDate_input = '02/01/2022'
+startDate_input = '04/10/2022'
 #endDate_input = input('Informe qual a data Final: ')
-endDate_input = '02/07/2022'''
+endDate_input = '04/11/2022'
 
 #Parâmetros de Opções do Webdriver do Chrome 
 options = Options()
@@ -58,12 +59,12 @@ keywords.send_keys(software)
 #Definindo Range de Início da busca
 datas=validador_datas()
 startDate = navegador.find_element(By.ID,'published-start-date')
-startDate_input = input("Informe a data de início [mm/dd/yyyy]: ")
+#startDate_input = input("Informe a data de início [mm/dd/yyyy]: ")
 startDate.send_keys(startDate_input)
 
 #Definindo Range Final da busca
 endDate = navegador.find_element(By.ID,'published-end-date')
-endDate_input= input("Informe a data de término [mm/dd/yyyy]: ")
+#endDate_input= input("Informe a data de término [mm/dd/yyyy]: ")
 endDate.send_keys(endDate_input)
 
 #Validar email
@@ -158,7 +159,7 @@ df = pd.DataFrame(data = listFull,columns=['Software/Sistema','CVE','Current Des
 'References to Advisories, Solutions, and Tools','Known Affected Softwares Configuration','NVD Published Date','Link para o respectivo CVE'])
 
 #Gerando o arquivo do Excel a partir do Dataframe
-df.to_excel('Relatório de Vulnerabilidades - CVE.xlsx',sheet_name='Vulnerabilidades - CVE',header=True,index=False)
+df.to_excel('Vulnerabilidades_CVE.xlsx',sheet_name='Vulnerabilidades - CVE',header=True,index=False)
 
 print("Pesquisa concluída!\nEstamos enviando as informações para o email informado")
 
@@ -178,15 +179,17 @@ EMAIL_ADDRESS = 'timetigerpython@gmail.com'
 EMAIL_PASSWORD = senha
 fromaddr = EMAIL_ADDRESS
 toaddr = email_informado
-#today=date.today()
+data=datetime.datetime.now()
+today=(str(data.day) +"/"+ str(data.month) +"/"+ str(data.year))
+print(today)
 msg = MIMEMultipart()
 msg['From'] = fromaddr
 msg['To'] = toaddr
-msg['Subject'] = ("Vulnerabilidades Críticas, Data: ")
+msg['Subject'] = ("Vulnerabilidades Críticas, Data: ")+today
 body = (f"Segue na tabela abaixo as vulnerabilidades classificadas como altas:\n\n{tabela}")
 msg.attach(MIMEText(body, 'plain'))
-filename = "Relatório de Vulnerabilidades - CVE.xlsx"
-attachment = open("C:\\Users\\lenovo\\Documents\\WebScraping\\Relatório de Vulnerabilidades - CVE.xlsx", "rb")
+filename = "Vulnerabilidades_CVE.xlsx"
+attachment = open("Vulnerabilidades_CVE.xlsx", "rb")
 p = MIMEBase('application', 'octet-stream')
 p.set_payload((attachment).read())
 encoders.encode_base64(p)

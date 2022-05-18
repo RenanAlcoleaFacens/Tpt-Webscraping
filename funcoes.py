@@ -24,14 +24,19 @@ def validador_datas():
     return dataUS
 
 #Função que retorna a Severity do CVE (4º Item da lista)
-def busca_severity(siteSP):    
+def busca_severity(siteSP):
     if siteSP.find('a',attrs={'id': 'Cvss3NistCalculatorAnchor'}):
-        severity_Input = siteSP.find('a',attrs={'id': 'Cvss3NistCalculatorAnchor'}).getText()   
-        severity_Input = str(severity_Input).split(" ")[0]   
+        severity_Input = siteSP.find('a',attrs={'id': 'Cvss3NistCalculatorAnchor'}).getText() 
+        severity_Input = str(severity_Input).split(" ")[0]
+        severity_Input = float(severity_Input)
+    elif siteSP.find('a',attrs={'id': 'Cvss3CnaCalculatorAnchor'}):
+        #severity_Input = siteSP.find(attrs={'data-testid':'vuln-cvss3-cna-panel-score'}).getText()
+        severity_Input = siteSP.find('a',attrs={'id': 'Cvss3CnaCalculatorAnchor'}).getText() 
+        severity_Input = str(severity_Input).split(" ")[0]
         severity_Input = float(severity_Input)
     else:
         severity_Input = 0
-    return severity_Input 
+    return severity_Input
 
 #Função que retorna os Hyperlinks do CVE (5º Item da lista)
 def busca_links(pagina_resultadoCVE_BS,links_impresso = 0,i=0,counter=0):
@@ -44,7 +49,7 @@ def busca_links(pagina_resultadoCVE_BS,links_impresso = 0,i=0,counter=0):
 
     #Executando o comando de separar o link do corpo html através do get_text(), repetindo a qtd de vezes necessária:
     else:
-        links_impresso = links_impresso + ',' + str(pagina_resultadoCVE_BS.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i)}).get_text())
+        links_impresso = links_impresso + '\n' + str(pagina_resultadoCVE_BS.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i)}).get_text())
 
     i=i+1
 
@@ -64,15 +69,21 @@ def busca_kasc(pagina_resultadoCVE_BS,KASC=0,i=0,counter=0):
 
         if pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}):
             KASC = pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}).get_text()[2:]
+        elif pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}):
+            KASC = KASC + '\n ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}).get_text()[2:]
         else:
-            KASC = pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}).get_text()[2:]
+            KASC="N/A"
+            return KASC
 
     #Executando o comando de separar o link do corpo html através do get_text(), repetindo a qtd de vezes necessária:    
     
     if pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}):
-        KASC = KASC + ', ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}).get_text()[2:]
+        KASC = KASC + '\n ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}).get_text()[2:]
+    elif pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}):
+        KASC = KASC + '\n ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}).get_text()[2:]
     else:
-        KASC = KASC + ', ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}).get_text()[2:]
+        KASC="N/A"
+        return KASC
     
     i=i+1
 
