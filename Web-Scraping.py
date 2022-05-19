@@ -16,6 +16,12 @@ import os
 
 app = Flask(__name__)
 
+#colocar o site no ar
+if __name__ == "__main__":
+    #app.secret_key = 'super secret key'
+    port = int(os.getenv('PORT'), '5000')
+    app.run(host='0.0.0.0', port= port)
+
 @app.route("/")
 def homepage():
     return render_template("homepage.html")
@@ -153,11 +159,7 @@ def pesquisar():
         pag.alert(text="Por favor, preencha novamente os campos.", title="Erro" )
         return render_template("homepage.html")
 
-#colocar o site no ar
-if __name__ == "__main__":
-    app.secret_key = 'super secret key'
-    port = int(os.getenv('PORT'), '5000')
-    app.run(host='0.0.0.0', port= port)
+
 
 
 
