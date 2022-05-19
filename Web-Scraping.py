@@ -2,19 +2,8 @@
 from fileinput import filename
 from math import fabs
 from re import A
-from attr import attrs
 from numpy import empty
-from datetime import datetime
-import pandas as pd
 import os
-from bs4 import BeautifulSoup
-from time import sleep
-from attr import attrs
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from tiger_pass import senha
-from funcoes import *
 import re
 from datetime import date
 
@@ -173,7 +162,8 @@ def pesquisar():
 
         #Envio do Email
         envia_email(listFull,email_flask)
-        return "<h1 style='text-align: center; margin-top: 20px;'>Sucesso! <br> Dados enviados para o E-mail informado.</h1>"
+        
+        return render_template("success.html")
     except:
         #return render_template("homepage.html", error = error)
         pag.alert(text="Por favor, preencha novamente os campos.", title="Erro" )
