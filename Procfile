@@ -1,1 +1,1 @@
-echo "web: gunicorn app:Web-Scraping" > Procfile
+echo "web: gunicorn app:nistwebscraping" > Procfile
