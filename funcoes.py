@@ -66,31 +66,22 @@ def busca_kasc(pagina_resultadoCVE_BS,KASC=0,i=0,counter=0):
         KASC = ""
         #Separando a tabela que contém os links e quantidade de tags que contém links:
         counter = len(pagina_resultadoCVE_BS.find_all(text="CPE Configuration"))
-
+        #Executando o comando de separar o link do corpo html através do get_text(), repetindo a qtd de vezes necessária:    
+    
         if pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}):
-            KASC = pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}).get_text()[2:]
+            KASC = KASC + '\n ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}).get_text()[2:]
         elif pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}):
             KASC = KASC + '\n ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}).get_text()[2:]
         else:
             KASC="N/A"
             return KASC
+        
+        i=i+1
 
-    #Executando o comando de separar o link do corpo html através do get_text(), repetindo a qtd de vezes necessária:    
-    
-    if pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}):
-        KASC = KASC + '\n ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}).get_text()[2:]
-    elif pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}):
-        KASC = KASC + '\n ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}).get_text()[2:]
-    else:
-        KASC="N/A"
-        return KASC
-    
-    i=i+1
-
-    if i == counter:
-        return KASC
-    else:
-        return busca_kasc(pagina_resultadoCVE_BS,KASC,i,counter)
+        if i == counter:
+            return KASC
+        else:
+            return busca_kasc(pagina_resultadoCVE_BS,KASC,i,counter)
 
 #Função que retorna a Data de Publicação da CVE (7º Item da lista)
 def busca_publish(siteSP):     

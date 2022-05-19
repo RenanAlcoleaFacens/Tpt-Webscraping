@@ -34,9 +34,9 @@ from prettytable import PrettyTable
 #software = input('Digite qual a vulnerabilidade que gostaria de procurar: ')
 #software = 'microsoft'
 #startDate_input = input('Informe qual a data de Início: ')
-startDate_input = '04/10/2022'
+startDate_input = '02/01/2022'
 #endDate_input = input('Informe qual a data Final: ')
-endDate_input = '04/14/2022'
+endDate_input = '02/07/2022'
 
 #Parâmetros de Opções do Webdriver do Chrome 
 options = Options()
