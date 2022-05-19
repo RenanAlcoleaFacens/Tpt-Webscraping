@@ -6,6 +6,7 @@ from email.mime.base import MIMEBase
 from email.message import EmailMessage
 from email import encoders
 import smtplib
+from time import strftime
 import pandas as pd
 from tiger_pass import senha    
 
@@ -120,8 +121,7 @@ def envia_email(listFull,email_flask):
     EMAIL_PASSWORD = senha
     fromaddr = EMAIL_ADDRESS
     toaddr = email_flask
-    data=datetime.datetime.now()
-    today=(str(data.day) +"/"+ str(data.month) +"/"+ str(data.year))
+    today = (datetime.today()).strftime('%d/%m/%Y')
     msg = MIMEMultipart()
     msg['From'] = fromaddr
     msg['To'] = toaddr
