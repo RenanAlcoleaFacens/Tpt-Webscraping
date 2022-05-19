@@ -1,1 +1,1 @@
-echo "web: gunicorn app:nistwebscraping" > Procfile
+web: gunicorn -b :$PORT Web-Scraping:app

@@ -12,6 +12,7 @@ from flask import Flask, render_template, flash
 from flask import request
 from datetime import datetime
 import pyautogui as pag
+import os
 
 app = Flask(__name__)
 
@@ -155,7 +156,8 @@ def pesquisar():
 #colocar o site no ar
 if __name__ == "__main__":
     app.secret_key = 'super secret key'
-    app.run(debug=True)
+    port = int(os.getenv('PORT'), '5000')
+    app.run(host='0.0.0.0', port= port)
 
 
 
