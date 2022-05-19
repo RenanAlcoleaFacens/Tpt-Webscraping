@@ -1,7 +1,12 @@
+from cgitb import html
 from fileinput import filename
 from math import fabs
+from msilib.schema import Class
 from re import A
+from tkinter import CENTER
 from attr import attrs
+from click import style
+from matplotlib.pyplot import table
 from numpy import empty
 import requests
 from datetime import datetime
@@ -22,15 +27,16 @@ from selenium.webdriver.chrome.options import Options
 from tiger_pass import senha
 from funcoes import *
 import re
-from datetime import date
 import datetime
+from prettytable import PrettyTable
+
 
 #software = input('Digite qual a vulnerabilidade que gostaria de procurar: ')
 #software = 'microsoft'
 #startDate_input = input('Informe qual a data de Início: ')
 startDate_input = '04/10/2022'
 #endDate_input = input('Informe qual a data Final: ')
-endDate_input = '04/11/2022'
+endDate_input = '04/14/2022'
 
 #Parâmetros de Opções do Webdriver do Chrome 
 options = Options()
@@ -172,7 +178,7 @@ tabela = pd.read_excel("webscrap.xlsx")
 #Retira valores menores que 7 da tabela
 tabela.loc[tabela["Severity"]<7 ,['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE']]= None
 tabela = pd.DataFrame(tabela.dropna(how="any"))
-
+tabela_html=tabela.to_html()
 
 #Configurar e-mail e senha
 EMAIL_ADDRESS = 'timetigerpython@gmail.com'
@@ -181,13 +187,15 @@ fromaddr = EMAIL_ADDRESS
 toaddr = email_informado
 data=datetime.datetime.now()
 today=(str(data.day) +"/"+ str(data.month) +"/"+ str(data.year))
-print(today)
+'''tabela=PrettyTable()
+tabel=tabela.get_html_string()
+print(tabel)'''
 msg = MIMEMultipart()
 msg['From'] = fromaddr
 msg['To'] = toaddr
 msg['Subject'] = ("Vulnerabilidades Críticas, Data: ")+today
-body = (f"Segue na tabela abaixo as vulnerabilidades classificadas como altas:\n\n{tabela}")
-msg.attach(MIMEText(body, 'plain'))
+body = (f"Segue na tabela abaixo as vulnerabilidades classificadas como altas:\n\n{tabela_html}")
+msg.attach(MIMEText(body, 'html'))
 filename = "Vulnerabilidades_CVE.xlsx"
 attachment = open("Vulnerabilidades_CVE.xlsx", "rb")
 p = MIMEBase('application', 'octet-stream')
