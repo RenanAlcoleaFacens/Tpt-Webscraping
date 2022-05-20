@@ -73,7 +73,7 @@ def pesquisar():
         submitBtn = driver.find_element(By.ID,'vuln-search-submit')
         submitBtn.click()
 
-        sleep(2)
+        sleep(3)
 
         #Transformando o conteúdo da página no padrão do Beautiful Soup 4
         siteFP = BeautifulSoup(driver.page_source,'html.parser')
