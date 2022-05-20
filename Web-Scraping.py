@@ -36,7 +36,7 @@ def pesquisar():
         #Parâmetros de Opções do Webdriver do Chrome 
         options = Options()
         options.add_argument('window-size=800,1000')
-        #options.add_argument('--headless')
+        options.add_argument('--headless')
 
         #Definindo o navegador através do Webdriver e inicializando com parâmetros de um objetos da classe "Option"
         navegador = webdriver.Chrome(options=options)
