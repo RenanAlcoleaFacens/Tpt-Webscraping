@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nist Expansion</title>  
+  <title>Nist Expansion</title>
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
@@ -27,12 +28,12 @@
 
   <nav id="navbar" class="navbar navbar-primary bg-primary">
     <a class="navbar-brand" href="/">
-      <img id="logo" src="/static/tiger-python.png" width="200" height="70" alt="">
+      <img id="logo" src="/static/tiger-python.png" width="200" height="80" alt="">
     </a>
   </nav>
   <div>
     <center>
-      <img id="product" src="/static/nist-expansion.png" width="600" height="300" alt="nist-expansion">  
+      <img class="img-fluid" id="product" src="/static/nist-expansion.png" width="600" height="300" alt="nist-expansion">  
     </center>
   </div>
   <form action="/pesquisar" class="container" method="post">
