@@ -1,20 +1,3 @@
-'''
-from fileinput import filename
-from math import fabs
-from re import A
-from numpy import empty
-import os
-import re
-from datetime import date
-
-#Validar email
-padrao = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
-while True:
-    email_informado = input("Digite um e-mail válido para receber as CVEs encontradas: ")
-    if (re.search(padrao,email_informado)) :
-        print("Email válido")
-        break
-'''
 from ssl import AlertDescription
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -28,7 +11,7 @@ from funcoes import *
 from flask import Flask, render_template, flash
 from flask import request
 from datetime import datetime
-import pyautogui as pag
+
 
 app = Flask(__name__)
 
