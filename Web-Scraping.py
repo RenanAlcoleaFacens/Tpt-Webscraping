@@ -149,13 +149,12 @@ def pesquisar():
         return render_template("success.html")
     except:
         #return render_template("homepage.html", error = error)
-        pag.alert(text="Por favor, preencha novamente os campos.", title="Erro" )
         return render_template("homepage.html")
 
 #colocar o site no ar
 if __name__ == "__main__":
     app.secret_key = 'super secret key'
-    app.run(debug=False)
+    app.run()
 
 
 
