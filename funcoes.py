@@ -6,6 +6,7 @@ from email.mime.base import MIMEBase
 from email.message import EmailMessage
 from email import encoders
 import smtplib
+from time import strftime
 import pandas as pd
 from tiger_pass import senha    
 
@@ -74,24 +75,19 @@ def busca_kasc(pagina_resultadoCVE_BS,KASC=0,i=0,counter=0):
         #Separando a tabela que contém os links e quantidade de tags que contém links:
         counter = len(pagina_resultadoCVE_BS.find_all(text="CPE Configuration"))
 
+        #Executando o comando de separar o link do corpo html através do get_text(), repetindo a qtd de vezes necessária:    
+        
         if pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}):
-            KASC = pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}).get_text()[2:]
+            KASC = KASC + ', ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}).get_text()[2:]
         else:
-            KASC = pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}).get_text()[2:]
+            KASC = KASC + ', ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}).get_text()[2:]
+        
+        i=i+1
 
-    #Executando o comando de separar o link do corpo html através do get_text(), repetindo a qtd de vezes necessária:    
-    
-    if pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}):
-        KASC = KASC + ', ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}).get_text()[2:]
-    else:
-        KASC = KASC + ', ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}).get_text()[2:]
-    
-    i=i+1
-
-    if i == counter:
-        return KASC
-    else:
-        return busca_kasc(pagina_resultadoCVE_BS,KASC,i,counter)
+        if i == counter:
+            return KASC
+        else:
+            return busca_kasc(pagina_resultadoCVE_BS,KASC,i,counter)
 
 #Função que retorna a Data de Publicação da CVE (7º Item da lista)
 def busca_publish(siteSP):     
@@ -101,7 +97,7 @@ def busca_publish(siteSP):
 def busca_details(cveInput):
     return 'https://nvd.nist.gov/vuln/detail/'+cveInput
 
-def envia_email(listFull,email_informado):
+def envia_email(listFull,email_flask):
 
     #Montando a estrutura do Dataframe com Pandas
     df = pd.DataFrame(data = listFull,columns=['Software/Sistema','CVE','Current Description', 'Severity',
@@ -111,28 +107,27 @@ def envia_email(listFull,email_informado):
     df.to_excel('Vulnerabilidades_CVE.xlsx',sheet_name='Vulnerabilidades - CVE',header=True,index=False)
 
     tabela=df.copy()
-    segundo_excell = pd.DataFrame(tabela, columns=['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE'])
-    segundo_excell.to_excel('webscrap.xlsx', index=False)
+    segundo_excel = pd.DataFrame(tabela, columns=['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE'])
+    segundo_excel.to_excel('webscrap.xlsx', index=False)
     tabela = pd.read_excel("webscrap.xlsx")
 
     #Retira valores menores que 7 da tabela
     tabela.loc[tabela["Severity"]<7 ,['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE']]= None
     tabela = pd.DataFrame(tabela.dropna(how="any"))
-    print("Pesquisa concluída!\nEstamos enviando as informações para o email informado")
-    
+    tabela_html=tabela.to_html()
 
+    #Configurar e-mail e senha
     EMAIL_ADDRESS = 'timetigerpython@gmail.com'
     EMAIL_PASSWORD = senha
     fromaddr = EMAIL_ADDRESS
-    toaddr = email_informado
-    data = datetime.now()
-    today=(str(data.day) +"/"+ str(data.month) +"/"+ str(data.year))
+    toaddr = email_flask
+    today = (datetime.today()).strftime('%d/%m/%Y')
     msg = MIMEMultipart()
     msg['From'] = fromaddr
     msg['To'] = toaddr
-    msg['Subject'] = ("Vulnerabilidades Críticas, Data: ") + today
-    body = (f"Segue na tabela abaixo as vulnerabilidades classificadas como altas:\n\n{tabela}")
-    msg.attach(MIMEText(body, 'plain'))
+    msg['Subject'] = ("Vulnerabilidades Críticas, Data: ")+today
+    body = (f"Segue na tabela abaixo as vulnerabilidades classificadas como altas:\n\n{tabela_html}")
+    msg.attach(MIMEText(body, 'html'))
     filename = "Vulnerabilidades_CVE.xlsx"
     attachment = open("Vulnerabilidades_CVE.xlsx", "rb")
     p = MIMEBase('application', 'octet-stream')
