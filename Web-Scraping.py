@@ -1,3 +1,6 @@
+
+from lib2to3.pgen2 import driver
+import os
 from ssl import AlertDescription
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -34,44 +37,46 @@ def pesquisar():
         endDate_input = datas[1]    
 
         #Parâmetros de Opções do Webdriver do Chrome 
-        options = Options()
-        options.add_argument('window-size=800,1000')
-        options.add_argument('--headless')
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument('--no-sandbox')
+        driver = webdriver.Chrome(executable_path=os.environ.get('CHROMEDRIVER_PATH'), chrome_options=chrome_options)
 
         #Definindo o navegador através do Webdriver e inicializando com parâmetros de um objetos da classe "Option"
-        navegador = webdriver.Chrome(options=options)
-        navegador.get('https://nvd.nist.gov/vuln/search')
+        driver.get('https://nvd.nist.gov/vuln/search')
 
         #Sleep de 2 segundos para renderizar toda a página
         sleep(2)
 
         #Seleciona o tipo de Busca como Avançado
-        advanced = navegador.find_element(By.ID,'SearchTypeAdvanced')
+        advanced = driver.find_element(By.ID,'SearchTypeAdvanced')
         advanced.click()
 
         sleep(2)
 
         #Seleciona a caixa de pesquisa da vulnerabilidade e digita a String passada pelo usuário
         software_flask =software_flask.upper()
-        keywords = navegador.find_element(By.ID,'Keywords')
+        keywords = driver.find_element(By.ID,'Keywords')
         keywords.send_keys(software_flask)       
 
         #Definindo Range de Início da busca
-        startDate = navegador.find_element(By.ID,'published-start-date')        
+        startDate = driver.find_element(By.ID,'published-start-date')        
         startDate.send_keys(startDate_input)
 
         #Definindo Range Final da busca
-        endDate = navegador.find_element(By.ID,'published-end-date')        
+        endDate = driver.find_element(By.ID,'published-end-date')        
         endDate.send_keys(endDate_input)
 
         #Selecionando o botão de Search
-        submitBtn = navegador.find_element(By.ID,'vuln-search-submit')
+        submitBtn = driver.find_element(By.ID,'vuln-search-submit')
         submitBtn.click()
 
         sleep(2)
 
         #Transformando o conteúdo da página no padrão do Beautiful Soup 4
-        siteFP = BeautifulSoup(navegador.page_source,'html.parser')
+        siteFP = BeautifulSoup(driver.page_source,'html.parser')
         tableContent = siteFP.find('table', attrs={'data-testid': 'vuln-results-table'})
         headContent =  siteFP.find('div', attrs={'id': 'body-section'})
 
@@ -88,7 +93,7 @@ def pesquisar():
         ########################################################################################################################################################
         for j in range (pages):
 
-            newsiteFP = BeautifulSoup(navegador.page_source,'html.parser')
+            newsiteFP = BeautifulSoup(driver.page_source,'html.parser')
             
             # Calcula a quantidade de itens da página atual
             if qtd_result <= 20:
@@ -117,9 +122,9 @@ def pesquisar():
                     descInput = tableContent.find('p',attrs={'data-testid': 'vuln-summary-'+str(i)}).getText()
 
                     #Obtendo o quarto elemento da Lista final (Severidade)            
-                    navegador.get('https://nvd.nist.gov/vuln/detail/'+cveInput)
+                    driver.get('https://nvd.nist.gov/vuln/detail/'+cveInput)
                     sleep(2)
-                    siteSP = BeautifulSoup(navegador.page_source,'html.parser')
+                    siteSP = BeautifulSoup(driver.page_source,'html.parser')
                     severity_Input=float(busca_severity(siteSP)) 
                     
 
@@ -134,10 +139,10 @@ def pesquisar():
                     
                     listResult = [software_flask,cveInput,descInput,severity_Input,reference_Input,kasc_Input,publish_Input,details_Input]        
                     listFull.append(listResult)           
-                    navegador.back() 
+                    driver.back() 
             
             if j < pages-1 and qtd_result >20:
-                nextBtn = navegador.find_element(By.LINK_TEXT,'>')
+                nextBtn = driver.find_element(By.LINK_TEXT,'>')
                 nextBtn.click()
             
 
