@@ -37,7 +37,9 @@ def homepage():
     return render_template("homepage.html")
 
 @app.route("/pesquisar", methods=['POST'])
+
 def pesquisar():
+    
     error = None
     try:
         software_flask = request.form['software']
@@ -173,6 +175,5 @@ def pesquisar():
 if __name__ == "__main__":
     app.secret_key = 'super secret key'
     app.run(debug=True)
-
 
 

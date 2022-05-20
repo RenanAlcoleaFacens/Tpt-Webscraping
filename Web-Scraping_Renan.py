@@ -28,7 +28,7 @@ from tiger_pass import senha
 from funcoes import *
 import re
 import datetime
-from prettytable import PrettyTable
+
 
 
 #software = input('Digite qual a vulnerabilidade que gostaria de procurar: ')

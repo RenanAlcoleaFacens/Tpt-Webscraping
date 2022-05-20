@@ -8,6 +8,11 @@ from email import encoders
 import smtplib
 import pandas as pd
 from tiger_pass import senha    
+import matplotlib.pyplot as plt
+from pandas.plotting import table
+import dataframe_image as dfi
+import numpy as np
+#import pywhatkit
 
 def validador_datas(dataBR1,dataBR2):
     
@@ -34,16 +39,7 @@ def validador_datas(dataBR1,dataBR2):
 def busca_severity(siteSP):
     if siteSP.find('a',attrs={'id': 'Cvss3NistCalculatorAnchor'}):
         severity_Input = siteSP.find('a',attrs={'id': 'Cvss3NistCalculatorAnchor'}).getText() 
-<<<<<<< HEAD
-        severity_Input = str(severity_Input).split(" ")[0]
-        severity_Input = float(severity_Input)
-    elif siteSP.find('a',attrs={'id': 'Cvss3CnaCalculatorAnchor'}):
-        #severity_Input = siteSP.find(attrs={'data-testid':'vuln-cvss3-cna-panel-score'}).getText()
-        severity_Input = siteSP.find('a',attrs={'id': 'Cvss3CnaCalculatorAnchor'}).getText() 
-        severity_Input = str(severity_Input).split(" ")[0]
-=======
         severity_Input = str(severity_Input).split(" ")[0]   
->>>>>>> Renan
         severity_Input = float(severity_Input)
     elif siteSP.find('a',attrs={'id': 'Cvss3CnaCalculatorAnchor'}):
         #severity_Input = siteSP.find(attrs={'data-testid':'vuln-cvss3-cna-panel-score'}).getText()
@@ -82,17 +78,6 @@ def busca_kasc(pagina_resultadoCVE_BS,KASC=0,i=0,counter=0):
         KASC = ""
         #Separando a tabela que contém os links e quantidade de tags que contém links:
         counter = len(pagina_resultadoCVE_BS.find_all(text="CPE Configuration"))
-<<<<<<< HEAD
-        #Executando o comando de separar o link do corpo html através do get_text(), repetindo a qtd de vezes necessária:    
-    
-        if pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}):
-            KASC = KASC + '\n ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}).get_text()[2:]
-        elif pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}):
-            KASC = KASC + '\n ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}).get_text()[2:]
-        else:
-            KASC="N/A"
-            return KASC
-=======
 
         #Executando o comando de separar o link do corpo html através do get_text(), repetindo a qtd de vezes necessária:    
         
@@ -100,7 +85,6 @@ def busca_kasc(pagina_resultadoCVE_BS,KASC=0,i=0,counter=0):
             KASC = KASC + ', ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}).get_text()[2:]
         else:
             KASC = KASC + ', ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}).get_text()[2:]
->>>>>>> Renan
         
         i=i+1
 
@@ -136,13 +120,24 @@ def envia_email(listFull,email_flask):
     tabela = pd.DataFrame(tabela.dropna(how="any"))
     tabela_html=tabela.to_html()
 
+    #Tabela Vulnerabilidades_CVE para jpg
+    dfi.export(df, 'Vulnerabilidades.jpg')
+
+    #Tabela webscrap para jpg
+    dfi.export(tabela, 'Vulnerabilidades_altas.jpg')
+
+    #Enviar img por WhatsApp
+    '''img1='C:/Users/Lenovo/Documents/WebScraping/Vulnerabilidades_altas.jpg'
+    img2='C:/Users/Lenovo/Documents/WebScraping/Vulnerabilidades.jpg'
+    pywhatkit.sendwhats_image('+55'+whats,img1,'Vulnerabilidades altas')
+    pywhatkit.sendwhats_image('+55'+whats,img2,'Todas vulnerabilidades encontradas')'''
+
     #Configurar e-mail e senha
     EMAIL_ADDRESS = 'timetigerpython@gmail.com'
     EMAIL_PASSWORD = senha
     fromaddr = EMAIL_ADDRESS
     toaddr = email_flask
-    data=datetime.datetime.now()
-    today=(str(data.day) +"/"+ str(data.month) +"/"+ str(data.year))
+    today = (datetime.today()).strftime('%d/%m/%Y')
     msg = MIMEMultipart()
     msg['From'] = fromaddr
     msg['To'] = toaddr
@@ -162,3 +157,5 @@ def envia_email(listFull,email_flask):
     text = msg.as_string()
     s.sendmail(fromaddr, toaddr, text)
     s.quit()
+
+
