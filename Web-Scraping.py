@@ -73,13 +73,12 @@ def pesquisar():
         submitBtn = driver.find_element(By.ID,'vuln-search-submit')
         submitBtn.click()
 
-        sleep(3)
+        sleep(2)
 
         #Transformando o conteúdo da página no padrão do Beautiful Soup 4
         siteFP = BeautifulSoup(driver.page_source,'html.parser')
         tableContent = siteFP.find('table', attrs={'data-testid': 'vuln-results-table'})
         headContent =  siteFP.find('div', attrs={'id': 'body-section'})
-
 
         listFull = []
 
