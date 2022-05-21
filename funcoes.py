@@ -48,7 +48,6 @@ def busca_severity(siteSP):
 
 #Função que retorna os Hyperlinks do CVE (5º Item da lista)
 def busca_links(siteSP,links_impresso = 0,i=0,counter=0):
-
     if i == 0:
         links_impresso = ""
         #Separando a tabela que contém os links e quantidade de tags que contém links:
@@ -58,8 +57,7 @@ def busca_links(siteSP,links_impresso = 0,i=0,counter=0):
     #Executando o comando de separar o link do corpo html através do get_text(), repetindo a qtd de vezes necessária:
     else:
         links_impresso = links_impresso + '\n' + str(siteSP.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i)}).get_text())
-        print (links_impresso)
-
+        
     i=i+1
 
     if i == counter:
