@@ -47,47 +47,54 @@ def busca_severity(siteSP):
     return severity_Input 
 
 #Função que retorna os Hyperlinks do CVE (5º Item da lista)
-def busca_links(pagina_resultadoCVE_BS,links_impresso = 0,i=0,counter=0):
+def busca_links(siteSP,links_impresso = 0,i=0,counter=0):
 
     if i == 0:
         links_impresso = ""
         #Separando a tabela que contém os links e quantidade de tags que contém links:
-        counter = len(pagina_resultadoCVE_BS.find('table',class_='table table-striped table-condensed table-bordered detail-table').find_all('a'))
-        links_impresso = str(pagina_resultadoCVE_BS.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i)}).get_text())
+        counter = len(siteSP.find('table',class_='table table-striped table-condensed table-bordered detail-table').find_all('a'))
+        links_impresso = str(siteSP.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i)}).get_text())
 
     #Executando o comando de separar o link do corpo html através do get_text(), repetindo a qtd de vezes necessária:
     else:
-        links_impresso = links_impresso + ',' + str(pagina_resultadoCVE_BS.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i)}).get_text())
+        links_impresso = links_impresso + '\n' + str(siteSP.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i)}).get_text())
+        print (links_impresso)
 
     i=i+1
 
     if i == counter:
         return links_impresso 
     else:
-        return busca_links(pagina_resultadoCVE_BS,links_impresso,i,counter)
+        return busca_links(siteSP,links_impresso,i,counter)
 
 #Função que retorna os Known Affected Software Configurations (6º Item da lista)
 
-def busca_kasc(pagina_resultadoCVE_BS,KASC=0,i=0,counter=0):
+def busca_kasc(siteSP,KASC=0,i=0,counter=0):
     
     if i == 0:
         KASC = ""
         #Separando a tabela que contém os links e quantidade de tags que contém links:
-        counter = len(pagina_resultadoCVE_BS.find_all(text="CPE Configuration"))
+        counter = len(siteSP.find_all(text="CPE Configuration"))
+        print ('passando primeira vez', counter)
 
-        #Executando o comando de separar o link do corpo html através do get_text(), repetindo a qtd de vezes necessária:    
-        
-        if pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}):
-            KASC = KASC + ', ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}).get_text()[2:]
+        #Executando o comando de separar o link do corpo html através do get_text(), repetindo a qtd de vezes necessária:        
+        if siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}):
+            KASC = siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}).get_text()[2:]
+        elif siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}):
+            KASC = siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}).get_text()[2:]
         else:
-            KASC = KASC + ', ' + pagina_resultadoCVE_BS.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}).get_text()[2:]
-        
-        i=i+1
-
-        if i == counter:
-            return KASC
-        else:
-            return busca_kasc(pagina_resultadoCVE_BS,KASC,i,counter)
+            i=i-1
+            KASC = 'N/A'
+    else:   
+        if siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}):
+            KASC = KASC + '\n' + siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}).get_text()[2:]
+        elif siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}):
+            KASC = KASC + '\n' + siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}).get_text()[2:]
+    i=i+1
+    if i == counter:
+        return KASC        
+    else:
+        return busca_kasc(siteSP,KASC,i,counter)
 
 #Função que retorna a Data de Publicação da CVE (7º Item da lista)
 def busca_publish(siteSP):     
