@@ -1,1 +1,1 @@
-web: gunicorn Web-Scraping:app --timeout 500
+web: gunicorn Web-Scraping:app --timeout 5000
