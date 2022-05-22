@@ -124,7 +124,7 @@ def envia_email(listFull,email_flask):
 
     df.to_excel('Vulnerabilidades_CVE.xlsx',sheet_name='Vulnerabilidades - CVE',header=True,index=False) 
     
-
+    #Arrumando tamanho das colunas no Excel
     wb = load_workbook('Vulnerabilidades_CVE.xlsx')   
     ws = wb['Vulnerabilidades - CVE']
     ws.column_dimensions['A'].width = 18 #Software 
