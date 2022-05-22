@@ -12,9 +12,6 @@ from tiger_pass import senha
 
 def validador_datas(dataBR1,dataBR2):
     
-    #dataBR1 = '01/02/2022'
-    #dataBR2 = '10/02/2022'
-
     # Data Inicial
     d1 = datetime.strptime(dataBR1, '%Y-%m-%d')
 
@@ -43,7 +40,7 @@ def busca_severity(siteSP):
         severity_Input = str(severity_Input).split(" ")[0]   
         severity_Input = float(severity_Input)  
     else:
-        severity_Input = 'N/A'
+        severity_Input = 0
     return severity_Input 
 
 #Função que retorna os Hyperlinks do CVE (5º Item da lista)
@@ -83,8 +80,7 @@ def busca_kasc(siteSP,KASC=0,i=0,counter=0):
         KASC = ""
         #Separando a tabela que contém os links e quantidade de tags que contém links:
         counter = len(siteSP.find_all(text="CPE Configuration"))
-        print ('passando primeira vez', counter)
-
+        
         #Executando o comando de separar o link do corpo html através do get_text(), repetindo a qtd de vezes necessária:        
         if siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}):
             KASC = siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}).get_text()[2:]
@@ -117,19 +113,22 @@ def envia_email(listFull,email_flask):
     #Montando a estrutura do Dataframe com Pandas
     df = pd.DataFrame(data = listFull,columns=['Software/Sistema','CVE','Current Description', 'Severity',
     'References to Advisories, Solutions, and Tools','Known Affected Softwares Configuration','NVD Published Date','Link para o respectivo CVE'])
-
-    #Gerando o arquivo do Excel a partir do Dataframe
-    df.to_excel('Vulnerabilidades_CVE.xlsx',sheet_name='Vulnerabilidades - CVE',header=True,index=False)
-
+    
     tabela=df.copy()
+    #Gerando o arquivo do Excel a partir do Dataframe
+
+    df.loc[df["Severity"]==0,['Severity']] = 'N/A'
+    
+    df.to_excel('Vulnerabilidades_CVE.xlsx',sheet_name='Vulnerabilidades - CVE',header=True,index=False)     
+
     segundo_excel = pd.DataFrame(tabela, columns=['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE'])
     segundo_excel.to_excel('WebScrap.xlsx', index=False)
     tabela = pd.read_excel("WebScrap.xlsx")
 
     #Retira valores menores que 7 da tabela
-    #tabela.loc[(df['Discount'] >= 1000) & (df['Discount'] <= 2000)]
-    tabela.loc[(tabela["Severity"]<7) | (tabela["Severity"] == 'N/A'),['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE']]= None
-    #tabela.loc[tabela["Severity"]<7 or tabela["Severity"] == 'N/A',['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE']]= None
+       
+    tabela.loc[tabela["Severity"]<7,['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE']]= None
+    
     tabela = pd.DataFrame(tabela.dropna(how="any"))
     tabela_html=tabela.to_html()
 
