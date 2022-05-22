@@ -43,7 +43,7 @@ def busca_severity(siteSP):
         severity_Input = str(severity_Input).split(" ")[0]   
         severity_Input = float(severity_Input)  
     else:
-        severity_Input = 0
+        severity_Input = 'N/A'
     return severity_Input 
 
 #Função que retorna os Hyperlinks do CVE (5º Item da lista)
