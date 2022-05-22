@@ -14,8 +14,7 @@ from funcoes import *
 from flask import Flask, render_template, flash
 from flask import request
 from datetime import datetime
-from gunicorn import util
-
+from threading import Thread
 
 app = Flask(__name__)
 
@@ -24,7 +23,7 @@ def homepage():
     return render_template("homepage.html")
 
 @app.route("/pesquisar", methods=['POST'])
-def pesquisar():
+def pesquisar():     
     error = None
     try:
         software_flask = request.form['software']
@@ -40,7 +39,7 @@ def pesquisar():
         #Parâmetros de Opções do Webdriver do Chrome 
         chrome_options = webdriver.ChromeOptions()
         chrome_options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
-        chrome_options.add_argument('--headless')
+        #chrome_options.add_argument('--headless')
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument('--no-sandbox')
         driver = webdriver.Chrome(executable_path=os.environ.get('CHROMEDRIVER_PATH'), chrome_options=chrome_options)
@@ -74,6 +73,8 @@ def pesquisar():
         submitBtn = driver.find_element(By.ID,'vuln-search-submit')
         submitBtn.click()
 
+        render_template("success.html")  
+
         sleep(2)
 
         #Transformando o conteúdo da página no padrão do Beautiful Soup 4
@@ -88,7 +89,8 @@ def pesquisar():
         if qtd_result%20 > 0:
             pages = (qtd_result//20)+1
         else:
-            pages = qtd_result//20        
+            pages = qtd_result//20  
+                
 
         ########################################################################################################################################################
         for j in range (pages):
@@ -125,8 +127,7 @@ def pesquisar():
                     driver.get('https://nvd.nist.gov/vuln/detail/'+cveInput)
                     sleep(2)
                     siteSP = BeautifulSoup(driver.page_source,'html.parser')
-                    severity_Input=float(busca_severity(siteSP)) 
-                    
+                    severity_Input=float(busca_severity(siteSP))                     
 
                     #Obtendo o quinto elemento da Lista final (Referências)
                     reference_Input = busca_links(siteSP)
@@ -143,19 +144,19 @@ def pesquisar():
             
             if j < pages-1 and qtd_result >20:
                 nextBtn = driver.find_element(By.LINK_TEXT,'>')
-                nextBtn.click()
-            
+                nextBtn.click()        
 
         ########################################################################################################################################################
 
         #Envio do Email
-        envia_email(listFull,email_flask)
+        envia_email(listFull,email_flask)  
+        return print('oi')   
         
-        return render_template("success.html")
     except:
         #return render_template("homepage.html", error = error)
+        print('ERRO')
         return render_template("homepage.html")
-
+        
 #colocar o site no ar
 if __name__ == "__main__":
     app.secret_key = 'super secret key'
