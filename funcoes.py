@@ -8,7 +8,8 @@ from email import encoders
 import smtplib
 from time import strftime
 import pandas as pd
-from tiger_pass import senha    
+from tiger_pass import senha 
+from flask import Flask, render_template
 
 def validador_datas(dataBR1,dataBR2):
     
@@ -20,8 +21,7 @@ def validador_datas(dataBR1,dataBR2):
 
     #Calcula se o período informado é maior que 180 dias:
     if abs((d2 - d1).days)>180:        
-        print("O período pesquisado não pode ser maior que 180 dias!")
-        return
+        return render_template("error.html")
     else:
         dataUS1 = dataBR1[5:7]+ "/" + dataBR1[8:] + "/" + dataBR1[0:4]
         dataUS2 = dataBR2[5:7]+ "/" + dataBR2[8:] + "/" + dataBR2[0:4]
@@ -113,6 +113,15 @@ def envia_email(listFull,email_flask):
     #Montando a estrutura do Dataframe com Pandas
     df = pd.DataFrame(data = listFull,columns=['Software/Sistema','CVE','Current Description', 'Severity',
     'References to Advisories, Solutions, and Tools','Known Affected Softwares Configuration','NVD Published Date','Link para o respectivo CVE'])
+
+    df.style.set_properties(subset=['Software/Sistema'], **{'width': '300px'})
+    df.style.set_properties(subset=['CVE'], **{'width': '300px'})
+    df.style.set_properties(subset=['Current Description'], **{'width': '300px'})
+    df.style.set_properties(subset=['Severity'], **{'width': '300px'})
+    df.style.set_properties(subset=['References to Advisories, Solutions, and Tools'], **{'width': '300px'})
+    df.style.set_properties(subset=['Known Affected Softwares Configuration'], **{'width': '300px'})
+    df.style.set_properties(subset=['NVD Published Date'], **{'width': '300px'})
+    df.style.set_properties(subset=['Link para o respectivo CVE'], **{'width': '300px'})
     
     tabela=df.copy()
     #Gerando o arquivo do Excel a partir do Dataframe

@@ -11,7 +11,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from tiger_pass import senha
 from funcoes import *
-from flask import Flask, render_template, flash
+from flask import Flask, render_template
 from flask import request
 from datetime import datetime
 from threading import Thread
@@ -154,8 +154,7 @@ def pesquisar():
         
     except:
         #return render_template("homepage.html", error = error)
-        print('ERRO')
-        return render_template("homepage.html")
+        return render_template("error.html")
         
 #colocar o site no ar
 if __name__ == "__main__":
