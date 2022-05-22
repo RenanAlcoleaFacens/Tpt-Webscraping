@@ -63,9 +63,9 @@ def busca_links(siteSP,links_impresso = 0,i=0,counter=0,aux=0):
     #Executando o comando de separar o link do corpo html através do get_text(), repetindo a qtd de vezes necessária:
     else:
         if aux==1:
-            links_impresso = links_impresso + '\n ' + str(siteSP.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i)}).get_text())
+            links_impresso = links_impresso + ', \n' + str(siteSP.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i)}).get_text())
         if aux==2:
-            links_impresso = links_impresso + ' \n' + str(siteSP.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i+1)}).get_text())
+            links_impresso = links_impresso + ', \n' + str(siteSP.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i+1)}).get_text())
             
 
     i=i+1
@@ -95,9 +95,9 @@ def busca_kasc(siteSP,KASC=0,i=0,counter=0):
             KASC = 'N/A'
     else:   
         if siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}):
-            KASC = KASC + '\n' + siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}).get_text()[2:]
+            KASC = KASC + ', \n' + siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0-0'}).get_text()[2:]
         elif siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}):
-            KASC = KASC + '\n' + siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}).get_text()[2:]
+            KASC = KASC + ', \n' + siteSP.find('b',attrs={'data-testid':'vuln-software-cpe-'+str(i+1)+'-0-0'}).get_text()[2:]
     i=i+1
     if i == counter:
         return KASC        
@@ -123,11 +123,11 @@ def envia_email(listFull,email_flask):
 
     tabela=df.copy()
     segundo_excel = pd.DataFrame(tabela, columns=['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE'])
-    segundo_excel.to_excel('webscrap.xlsx', index=False)
-    tabela = pd.read_excel("webscrap.xlsx")
+    segundo_excel.to_excel('WebScrap.xlsx', index=False)
+    tabela = pd.read_excel("WebScrap.xlsx")
 
     #Retira valores menores que 7 da tabela
-    tabela.loc[tabela["Severity"]<7 ,['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE']]= None
+    tabela.loc[tabela["Severity"]<7 or tabela["Severity"] == 'N/A',['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE']]= None
     tabela = pd.DataFrame(tabela.dropna(how="any"))
     tabela_html=tabela.to_html()
 
