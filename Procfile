@@ -1,1 +1,1 @@
-web: gunicorn Web-Scraping:app --max-requests 1200
+web: gunicorn Web-Scraping:app
