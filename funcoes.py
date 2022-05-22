@@ -47,23 +47,33 @@ def busca_severity(siteSP):
     return severity_Input 
 
 #Função que retorna os Hyperlinks do CVE (5º Item da lista)
-def busca_links(siteSP,links_impresso = 0,i=0,counter=0):
+def busca_links(siteSP,links_impresso = 0,i=0,counter=0,aux=0):
+
     if i == 0:
         links_impresso = ""
         #Separando a tabela que contém os links e quantidade de tags que contém links:
         counter = len(siteSP.find('table',class_='table table-striped table-condensed table-bordered detail-table').find_all('a'))
-        links_impresso = str(siteSP.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i)}).get_text())
+        if siteSP.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i)}):
+            links_impresso = str(siteSP.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i)}).get_text())
+            aux = 1
+        else:
+            links_impresso = str(siteSP.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i+1)}).get_text())
+            aux = 2
 
     #Executando o comando de separar o link do corpo html através do get_text(), repetindo a qtd de vezes necessária:
     else:
-        links_impresso = links_impresso + '\n' + str(siteSP.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i)}).get_text())
-        
+        if aux==1:
+            links_impresso = links_impresso + '\n ' + str(siteSP.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i)}).get_text())
+        if aux==2:
+            links_impresso = links_impresso + ' \n' + str(siteSP.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i+1)}).get_text())
+            
+
     i=i+1
 
     if i == counter:
         return links_impresso 
     else:
-        return busca_links(siteSP,links_impresso,i,counter)
+        return busca_links(siteSP,links_impresso,i,counter,aux)
 
 #Função que retorna os Known Affected Software Configurations (6º Item da lista)
 
