@@ -73,7 +73,7 @@ def pesquisar():
         submitBtn = driver.find_element(By.ID,'vuln-search-submit')
         submitBtn.click()
 
-        render_template("success.html")  
+        
 
         sleep(2)
 
@@ -150,7 +150,7 @@ def pesquisar():
 
         #Envio do Email
         envia_email(listFull,email_flask)  
-        return print('oi')   
+        return render_template("success.html")  
         
     except:
         #return render_template("homepage.html", error = error)
