@@ -128,7 +128,7 @@ def envia_email(listFull,email_flask):
 
     #Retira valores menores que 7 da tabela
     #tabela.loc[(df['Discount'] >= 1000) & (df['Discount'] <= 2000)]
-    tabela.loc[(tabela["Severity"]<7) or (tabela["Severity"] == 'N/A'),['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE']]= None
+    tabela.loc[(tabela["Severity"]<7) | (tabela["Severity"] == 'N/A'),['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE']]= None
     #tabela.loc[tabela["Severity"]<7 or tabela["Severity"] == 'N/A',['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE']]= None
     tabela = pd.DataFrame(tabela.dropna(how="any"))
     tabela_html=tabela.to_html()
