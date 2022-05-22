@@ -5,11 +5,14 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.message import EmailMessage
 from email import encoders
+from re import I, U
 import smtplib
 from time import strftime
 import pandas as pd
-from tiger_pass import senha 
-from flask import Flask, render_template
+from tiger_pass import senha
+from flask import render_template
+from openpyxl import load_workbook
+from openpyxl.formatting.rule import ColorScaleRule, CellIsRule, FormulaRule
 
 def validador_datas(dataBR1,dataBR2):
     
@@ -63,8 +66,6 @@ def busca_links(siteSP,links_impresso = 0,i=0,counter=0,aux=0):
             links_impresso = links_impresso + ', \n' + str(siteSP.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i)}).get_text())
         if aux==2:
             links_impresso = links_impresso + ', \n' + str(siteSP.find('td',attrs={'data-testid':'vuln-hyperlinks-link-'+str(i+1)}).get_text())
-            
-
     i=i+1
 
     if i == counter:
@@ -114,27 +115,34 @@ def envia_email(listFull,email_flask):
     df = pd.DataFrame(data = listFull,columns=['Software/Sistema','CVE','Current Description', 'Severity',
     'References to Advisories, Solutions, and Tools','Known Affected Softwares Configuration','NVD Published Date','Link para o respectivo CVE'])
 
-    df.style.set_properties(subset=['Software/Sistema'], **{'width': '300px'})
-    df.style.set_properties(subset=['CVE'], **{'width': '300px'})
-    df.style.set_properties(subset=['Current Description'], **{'width': '300px'})
-    df.style.set_properties(subset=['Severity'], **{'width': '300px'})
-    df.style.set_properties(subset=['References to Advisories, Solutions, and Tools'], **{'width': '300px'})
-    df.style.set_properties(subset=['Known Affected Softwares Configuration'], **{'width': '300px'})
-    df.style.set_properties(subset=['NVD Published Date'], **{'width': '300px'})
-    df.style.set_properties(subset=['Link para o respectivo CVE'], **{'width': '300px'})
-    
     tabela=df.copy()
     #Gerando o arquivo do Excel a partir do Dataframe
 
     df.loc[df["Severity"]==0,['Severity']] = 'N/A'
     
-    df.to_excel('Vulnerabilidades_CVE.xlsx',sheet_name='Vulnerabilidades - CVE',header=True,index=False)     
+    ####df = pd.set_option('display.width', 1000)
 
+    df.to_excel('Vulnerabilidades_CVE.xlsx',sheet_name='Vulnerabilidades - CVE',header=True,index=False) 
+    
+
+    wb = load_workbook('Vulnerabilidades_CVE.xlsx')   
+    ws = wb['Vulnerabilidades - CVE']
+    ws.column_dimensions['A'].width = 18 #Software 
+    ws.column_dimensions['B'].width = 15 #CVE
+    ws.column_dimensions['C'].width = 50 #Current Description
+    ws.column_dimensions['D'].width = 9  #Severity
+    ws.column_dimensions['E'].width = 60 #Links
+    ws.column_dimensions['F'].width = 55 #KASC
+    ws.column_dimensions['G'].width = 19 #Publish Date
+    ws.column_dimensions['H'].width = 45 #Link - CVE (Details)
+    wb.save('Vulnerabilidades_CVE.xlsx')
+    wb.close()   
+  
     segundo_excel = pd.DataFrame(tabela, columns=['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE'])
     segundo_excel.to_excel('WebScrap.xlsx', index=False)
     tabela = pd.read_excel("WebScrap.xlsx")
 
-    #Retira valores menores que 7 da tabela
+    #Retira valores menores que 7 da tabela e cria o corpo do e-mail
        
     tabela.loc[tabela["Severity"]<7,['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE']]= None
     
