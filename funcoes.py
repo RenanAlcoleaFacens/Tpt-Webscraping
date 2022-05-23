@@ -134,7 +134,8 @@ def envia_email(listFull,email_flask):
     ws.column_dimensions['E'].width = 60 #Links
     ws.column_dimensions['F'].width = 55 #KASC
     ws.column_dimensions['G'].width = 19 #Publish Date
-    ws.column_dimensions['H'].width = 45 #Link - CVE (Details)
+    ws.column_dimensions['H'].width = 45 #Link - CVE (Details)  
+
     wb.save('Vulnerabilidades_CVE.xlsx')
     wb.close()   
   

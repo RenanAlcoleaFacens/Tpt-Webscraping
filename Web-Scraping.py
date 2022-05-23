@@ -114,7 +114,7 @@ def pesquisar():
                 listResult =[]
                 
                 if  headContent.find('strong',attrs={'data-testid': 'vuln-matching-records-count'}).get_text() == '0':
-                    print('Não existem falhas para este período informado')
+                    return render_template("great.html") 
 
                 else:
                     #Obtendo segundo elemento da Lista final (CVE)
