@@ -23,7 +23,7 @@ def validador_datas(dataBR1,dataBR2):
 
     #Calcula se o período informado é maior que 120 dias:
     if abs((d2 - d1).days)>120:        
-        return render_template("error.html")
+        return render_template("error_date.html")
     else:
         dataUS1 = dataBR1[5:7]+ "/" + dataBR1[8:] + "/" + dataBR1[0:4]
         dataUS2 = dataBR2[5:7]+ "/" + dataBR2[8:] + "/" + dataBR2[0:4]
