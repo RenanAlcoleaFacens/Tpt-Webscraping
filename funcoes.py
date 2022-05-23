@@ -5,7 +5,6 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.message import EmailMessage
 from email import encoders
-from re import I, U
 import smtplib
 from time import strftime
 import pandas as pd
@@ -22,8 +21,8 @@ def validador_datas(dataBR1,dataBR2):
     # Data Final
     d2 = datetime.strptime(dataBR2, '%Y-%m-%d')
 
-    #Calcula se o período informado é maior que 180 dias:
-    if abs((d2 - d1).days)>180:        
+    #Calcula se o período informado é maior que 120 dias:
+    if abs((d2 - d1).days)>120:        
         return render_template("error.html")
     else:
         dataUS1 = dataBR1[5:7]+ "/" + dataBR1[8:] + "/" + dataBR1[0:4]
