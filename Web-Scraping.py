@@ -71,9 +71,7 @@ def pesquisar():
 
         #Selecionando o botão de Search
         submitBtn = driver.find_element(By.ID,'vuln-search-submit')
-        submitBtn.click()
-
-        
+        submitBtn.click()       
 
         sleep(2)
 
@@ -86,37 +84,32 @@ def pesquisar():
 
         #Verifica a quantidade de páginas das CVE
         qtd_result = int(siteFP.find('strong',attrs={'data-testid':'vuln-matching-records-count'}).getText())
-        if qtd_result%20 > 0:
-            pages = (qtd_result//20)+1
+        if  headContent.find('strong',attrs={'data-testid': 'vuln-matching-records-count'}).get_text() == '0':
+             return render_template("great.html")
         else:
-            pages = qtd_result//20  
-                
-
-        ########################################################################################################################################################
-        for j in range (pages):
-
-            newsiteFP = BeautifulSoup(driver.page_source,'html.parser')
-            
-            # Calcula a quantidade de itens da página atual
-            if qtd_result <= 20:
-                fim_contagem = qtd_result
-            elif j == pages-1:
-                fim_contagem = qtd_result - 20 * j        
+            if qtd_result%20 > 0:
+                pages = (qtd_result//20)+1
             else:
-                fim_contagem = 20    
-            
-            for i in range (fim_contagem):                  
-                
-                tableContent = newsiteFP.find('table', attrs={'data-testid': 'vuln-results-table'})
-                headContent =  newsiteFP.find('div', attrs={'id': 'body-section'})
+                pages = qtd_result//20
 
-                #Criação da Lista de CVE e Informações
-                listResult =[]
-                
-                if  headContent.find('strong',attrs={'data-testid': 'vuln-matching-records-count'}).get_text() == '0':
-                    return render_template("great.html") 
-
+            for j in range (pages):
+                newsiteFP = BeautifulSoup(driver.page_source,'html.parser')                
+                # Calcula a quantidade de itens da página atual
+                if qtd_result <= 20:
+                    fim_contagem = qtd_result
+                elif j == pages-1:
+                    fim_contagem = qtd_result - 20 * j        
                 else:
+                    fim_contagem = 20    
+                
+                for i in range (fim_contagem):                  
+                    
+                    tableContent = newsiteFP.find('table', attrs={'data-testid': 'vuln-results-table'})
+                    headContent =  newsiteFP.find('div', attrs={'id': 'body-section'})
+
+                    #Criação da Lista de CVE e Informações
+                    listResult =[]     
+
                     #Obtendo segundo elemento da Lista final (CVE)
                     cveInput = tableContent.find('a',attrs={'data-testid': 'vuln-detail-link-'+str(i)}).getText()
 
@@ -141,19 +134,16 @@ def pesquisar():
                     listResult = [software_flask,cveInput,descInput,severity_Input,reference_Input,kasc_Input,publish_Input,details_Input]        
                     listFull.append(listResult)           
                     driver.back() 
-            
-            if j < pages-1 and qtd_result >20:
-                nextBtn = driver.find_element(By.LINK_TEXT,'>')
-                nextBtn.click()        
+                
+                if j < pages-1 and qtd_result >20:
+                    nextBtn = driver.find_element(By.LINK_TEXT,'>')
+                    nextBtn.click()           
 
-        ########################################################################################################################################################
-
-        #Envio do Email
-        envia_email(listFull,email_flask)  
-        return render_template("success.html")  
+            #Envio do Email
+            envia_email(listFull,email_flask)  
+            return render_template("success.html")  
         
     except:
-        #return render_template("homepage.html", error = error)
         return render_template("error.html")
         
 #colocar o site no ar
