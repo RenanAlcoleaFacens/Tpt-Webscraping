@@ -144,7 +144,10 @@ def pesquisar():
             return render_template("success.html")  
         
     except:
-        return render_template("error.html")
+        if datas == 'WrongDate':
+            return render_template("error_date.html")        
+        else:
+            return render_template("error.html")
         
 #colocar o site no ar
 if __name__ == "__main__":

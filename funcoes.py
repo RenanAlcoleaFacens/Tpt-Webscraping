@@ -23,12 +23,12 @@ def validador_datas(dataBR1,dataBR2):
 
     #Calcula se o período informado é maior que 120 dias:
     if abs((d2 - d1).days)>120:        
-        return render_template("error_date.html")
+        return 'WrongDate'
     else:
         dataUS1 = dataBR1[5:7]+ "/" + dataBR1[8:] + "/" + dataBR1[0:4]
         dataUS2 = dataBR2[5:7]+ "/" + dataBR2[8:] + "/" + dataBR2[0:4]
         dataUS = [dataUS1,dataUS2]
-    return dataUS
+        return dataUS
 
 #Função que retorna a Severity do CVE (4º Item da lista)
 def busca_severity(siteSP):    
