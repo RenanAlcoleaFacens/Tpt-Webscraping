@@ -110,6 +110,7 @@ def busca_details(cveInput):
     return 'https://nvd.nist.gov/vuln/detail/'+cveInput
 
 def envia_email(listFull,email_flask):
+    
 
     #Montando a estrutura do Dataframe com Pandas
     df = pd.DataFrame(data = listFull,columns=['Software/Sistema','CVE','Current Description', 'Severity',

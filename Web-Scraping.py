@@ -1,4 +1,3 @@
-
 from lib2to3.pgen2 import driver
 import os
 from ssl import AlertDescription
@@ -17,6 +16,7 @@ from datetime import datetime
 from threading import Thread
 
 app = Flask(__name__)
+
 
 @app.route("/")
 def homepage():
