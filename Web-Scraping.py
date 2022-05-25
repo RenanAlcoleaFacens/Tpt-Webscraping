@@ -14,9 +14,11 @@ from flask import Flask, render_template
 from flask import request
 from datetime import datetime
 from threading import Thread
+import sched, time
 
 app = Flask(__name__)
 
+s = sched.scheduler(time.time, time.sleep)
 
 @app.route("/")
 def homepage():
@@ -74,6 +76,14 @@ def pesquisar():
         submitBtn.click()       
 
         sleep(2)
+
+        def do_something(sc): 
+            print("Doing stuff...")
+            # do your stuff
+            sc.enter(15, 1, do_something, (sc,))
+
+        s.enter(15, 1, do_something, (s,))
+        s.run()
 
         #Transformando o conteúdo da página no padrão do Beautiful Soup 4
         siteFP = BeautifulSoup(driver.page_source,'html.parser')
