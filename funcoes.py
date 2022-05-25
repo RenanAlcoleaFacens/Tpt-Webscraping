@@ -12,6 +12,7 @@ from tiger_pass import senha
 from flask import render_template
 from openpyxl import load_workbook
 from openpyxl.formatting.rule import ColorScaleRule, CellIsRule, FormulaRule
+import os
 
 def validador_datas(dataBR1,dataBR2):
     
@@ -152,7 +153,7 @@ def envia_email(listFull,email_flask):
 
     #Configurar e-mail e senha
     EMAIL_ADDRESS = 'timetigerpython@gmail.com'
-    EMAIL_PASSWORD = senha
+    EMAIL_PASSWORD = os.environ.get('PASS')
     fromaddr = EMAIL_ADDRESS
     toaddr = email_flask
     today = (datetime.today()).strftime('%d/%m/%Y')
