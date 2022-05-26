@@ -8,7 +8,6 @@ from email import encoders
 import smtplib
 from time import strftime
 import pandas as pd
-from tiger_pass import senha
 from flask import render_template
 from openpyxl import load_workbook
 from openpyxl.formatting.rule import ColorScaleRule, CellIsRule, FormulaRule
@@ -37,8 +36,7 @@ def busca_severity(siteSP):
         severity_Input = siteSP.find('a',attrs={'id': 'Cvss3NistCalculatorAnchor'}).getText() 
         severity_Input = str(severity_Input).split(" ")[0]   
         severity_Input = float(severity_Input)
-    elif siteSP.find('a',attrs={'id': 'Cvss3CnaCalculatorAnchor'}):
-        #severity_Input = siteSP.find(attrs={'data-testid':'vuln-cvss3-cna-panel-score'}).getText()
+    elif siteSP.find('a',attrs={'id': 'Cvss3CnaCalculatorAnchor'}): 
         severity_Input = siteSP.find('a',attrs={'id': 'Cvss3CnaCalculatorAnchor'}).getText() 
         severity_Input = str(severity_Input).split(" ")[0]   
         severity_Input = float(severity_Input)  
@@ -119,9 +117,7 @@ def envia_email(listFull,email_flask):
     tabela=df.copy()
     #Gerando o arquivo do Excel a partir do Dataframe
 
-    df.loc[df["Severity"]==0,['Severity']] = 'N/A'
-    
-    ####df = pd.set_option('display.width', 1000)
+    df.loc[df["Severity"]==0,['Severity']] = 'N/A'    
 
     df.to_excel('Vulnerabilidades_CVE.xlsx',sheet_name='Vulnerabilidades - CVE',header=True,index=False) 
     
@@ -146,8 +142,7 @@ def envia_email(listFull,email_flask):
 
     #Retira valores menores que 7 da tabela e cria o corpo do e-mail
        
-    tabela.loc[tabela["Severity"]<7,['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE']]= None
-    
+    tabela.loc[tabela["Severity"]<7,['Software/Sistema','CVE','Severity','NVD Published Date','Link para o respectivo CVE']]= None    
     tabela = pd.DataFrame(tabela.dropna(how="any"))
     tabela_html=tabela.to_html()
 
@@ -172,7 +167,7 @@ def envia_email(listFull,email_flask):
     msg.attach(p)
     s = smtplib.SMTP('smtp.gmail.com', 587)
     s.starttls()
-    s.login(fromaddr, senha)
+    s.login(fromaddr, EMAIL_PASSWORD)
     text = msg.as_string()
     s.sendmail(fromaddr, toaddr, text)
     s.quit()
